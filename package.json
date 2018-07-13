@@ -4,7 +4,12 @@
   "description": "Algorithm generating a cryptographic key for MUTE collaborative session",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "",
+    "cz": "git-cz",
+    "commitmsg": "commitlint -e $GIT_PARAMS",
+    "prerelease": "npm run build && git add dist/*",
+    "release": "standard-version --no-verify"
   },
   "repository": {
     "type": "git",
@@ -29,6 +34,8 @@
   },
   "homepage": "https://github.com/coast-team/mute-crypto#readme",
   "devDependencies": {
+    "@commitlint/cli": "^7.0.0",
+    "@commitlint/config-conventional": "^7.0.1",
     "commitizen": "^2.10.1",
     "cz-conventional-changelog": "^2.1.0",
     "husky": "^0.14.3",
@@ -40,5 +47,15 @@
     "tslint-config-prettier": "^1.13.0",
     "typescript": "^2.9.2",
     "validate-commit-msg": "^2.14.0"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
   }
 }
