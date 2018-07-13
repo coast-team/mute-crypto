@@ -8,11 +8,8 @@
     "url": "git+https://github.com/coast-team/mute-crypto.git"
   },
   "keywords": [
-    "peer",
-    "to",
-    "peer",
+    "p2p",
     "cryptographic",
-    "group",
     "key"
   ],
   "author": "",
