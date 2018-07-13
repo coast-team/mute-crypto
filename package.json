@@ -3,15 +3,6 @@
   "version": "0.0.1",
   "description": "Algorithm generating a cryptographic key for MUTE collaborative session",
   "main": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "",
-    "lint": "tslint --fix -p tsconfig.json 'src/**/*.ts' && prettier --write --list-different 'src/**/*.ts' './*.{ts,js,json,md}'  && markdownlint ./*.md",
-    "cz": "git-cz",
-    "commitmsg": "commitlint -e $GIT_PARAMS",
-    "prerelease": "npm run build && git add dist/*",
-    "release": "standard-version --no-verify"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/coast-team/mute-crypto.git"
@@ -34,6 +25,19 @@
     "url": "https://github.com/coast-team/mute-crypto/issues"
   },
   "homepage": "https://github.com/coast-team/mute-crypto#readme",
+  "scripts": {
+    "build": "rm -rf dist && tsc --outDir dist/commonjs -m commonjs",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tslint --fix -p tsconfig.json 'src/**/*.ts' && prettier --write --list-different 'src/**/*.ts' './*.{ts,js,json,md}'  && markdownlint ./*.md",
+    "cz": "git-cz",
+    "precommit": "lint-staged && npm run build && git add dist/*",
+    "commitmsg": "commitlint -e $GIT_PARAMS",
+    "prerelease": "npm run build && git add dist/*",
+    "release": "standard-version --no-verify"
+  },
+  "dependencies": {
+    "crypto-api-wrapper": "^0.4.2"
+  },
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",
     "@commitlint/config-conventional": "^7.0.1",
@@ -58,5 +62,23 @@
     "commitizen": {
       "path": "node_modules/cz-conventional-changelog"
     }
+  },
+  "lint-staged": {
+    "linters": {
+      "*.md": [
+        "prettier --write --list-different",
+        "git add",
+        "markdownlint"
+      ],
+      "*.ts": [
+        "tslint --fix -p tsconfig.json",
+        "git add"
+      ],
+      "*.{ts,json,scss,css}": [
+        "prettier --write --list-different -e *proto*",
+        "git add"
+      ]
+    },
+    "concurrent": false
   }
 }
