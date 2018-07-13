@@ -1,0 +1,44 @@
+{
+  "name": "mute-crypto",
+  "version": "0.0.1",
+  "description": "Algorithm generating a cryptographic key for MUTE collaborative session",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coast-team/mute-crypto.git"
+  },
+  "keywords": [
+    "peer",
+    "to",
+    "peer",
+    "cryptographic",
+    "group",
+    "key"
+  ],
+  "author": "",
+  "contributors": [
+    "Philippe Kalitine <philippe.kalitine@gmail.com> (http://philippe.kalitine.name/)",
+    "Jean-Philippe Eisenbarth"
+  ],
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/coast-team/mute-crypto/issues"
+  },
+  "homepage": "https://github.com/coast-team/mute-crypto#readme",
+  "devDependencies": {
+    "commitizen": "^2.10.1",
+    "cz-conventional-changelog": "^2.1.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.2.0",
+    "markdownlint-cli": "^0.11.0",
+    "prettier": "^1.13.7",
+    "standard-version": "^4.4.0",
+    "tslint": "^5.10.0",
+    "tslint-config-prettier": "^1.13.0",
+    "typescript": "^2.9.2",
+    "validate-commit-msg": "^2.14.0"
+  }
+}
