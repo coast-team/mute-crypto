@@ -25,7 +25,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc --outDir dist/commonjs -m commonjs",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "tslint --fix -p tsconfig.json 'src/**/*.ts' && prettier --write --list-different 'src/**/*.ts' './*.{ts,js,json,md}'  && markdownlint ./*.md",
+    "lint": "tslint --fix -p tsconfig.json 'src/**/*.ts' && prettier --write --list-different 'src/**/*.ts' './*.{ts,js,json,md}'  && markdownlint ./*.md -i 'CHANGELOG.md'",
     "cz": "git-cz",
     "precommit": "lint-staged && npm run build && git add dist/*",
     "commitmsg": "commitlint -e $GIT_PARAMS",
@@ -66,7 +66,7 @@
       "*.md": [
         "prettier --write --list-different",
         "git add",
-        "markdownlint"
+        "markdownlint -i 'CHANGELOG.md'"
       ],
       "*.ts": [
         "tslint --fix -p tsconfig.json",
