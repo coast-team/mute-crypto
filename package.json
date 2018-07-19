@@ -2,7 +2,7 @@
   "name": "@coast-team/mute-crypto",
   "version": "0.0.2",
   "description": "Algorithm generating a cryptographic key for MUTE collaborative session",
-  "main": "src/index.js",
+  "main": "dist/commonjs/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/coast-team/mute-crypto.git"
@@ -34,7 +34,8 @@
     "publish": "npm publish --access public"
   },
   "dependencies": {
-    "crypto-api-wrapper": "^0.6.0"
+    "crypto-api-wrapper": "^0.6.3",
+    "rxjs": "^6.2.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",
