@@ -16,8 +16,9 @@ export enum Step {
 }
 
 export class KeyAgreementBD {
+  public static STREAM_ID = 700
   public status: KeyStatusEnum
-  isInitiator: boolean
+  private isInitiator: boolean
 
   private key: CryptoKey | undefined
   private subs: Subscription[]
@@ -30,12 +31,14 @@ export class KeyAgreementBD {
   private r: any | undefined // BN
   private zArray: any[] // BN[]
   private xArray: any[] // BN[]
+  private send: (msg: Uint8Array, streamID: number) => void
 
   constructor(
     memberJoinSource: Observable<{ myId: number; id: number }>,
     memberLeaveSource: Observable<{ myId: number; id: number }>,
     groupStatusSource: Observable<{ myId: number; status: GroupStatus }>,
-    messageSource: Observable<{}>
+    messageSource: Observable<{}>,
+    send: (msg: Uint8Array, streamID: number) => void
   ) {
     this.step = Step.WAITING_Z
     this.isInitiator = false
@@ -49,6 +52,7 @@ export class KeyAgreementBD {
     this.zArray = []
     this.xArray = []
     this.groupStatus = GroupStatus.LEFT
+    this.send = send
 
     // Subscribe to network events
     this.setMemberJoinSource(memberJoinSource)
@@ -138,9 +142,7 @@ export class KeyAgreementBD {
         if (status === GroupStatus.JOINED) {
           this.init(myId)
           this.verifyInitiator()
-          if (this.isInitiator) {
-            this.startCycle()
-          }
+          this.startCycle()
         } else if (status === GroupStatus.LEFT) {
           this.clean()
         }
@@ -148,5 +150,21 @@ export class KeyAgreementBD {
     )
   }
 
-  private startCycle() {}
+  private startCommonCycle() {}
+
+  private startInitiatorCycle() {
+    this.r = keyAgreementCrypto.generateRi()
+    this.zArray = new Array(this.members.length)
+    this.zArray[0] = keyAgreementCrypto.computeZi(this.r)
+    this.xArray = new Array(this.members.length)
+    this.send(this.zArray[0], KeyAgreementBD.STREAM_ID)
+  }
+
+  private startCycle() {
+    if (this.isInitiator) {
+      this.startInitiatorCycle()
+    } else {
+      this.startCommonCycle()
+    }
+  }
 }
