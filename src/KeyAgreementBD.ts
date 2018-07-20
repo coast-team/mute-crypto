@@ -2,6 +2,7 @@ import { keyAgreementCrypto } from 'crypto-api-wrapper'
 import { Observable, Subscription } from 'rxjs'
 
 import { KeyStatusEnum } from './KeyStatusEnum'
+import { IMessage, Message } from './proto'
 
 export enum GroupStatus {
   JOINING,
@@ -29,15 +30,15 @@ export class KeyAgreementBD {
   private members: number[]
   private myId: number
   private r: any | undefined // BN
-  private zArray: any[] // BN[]
-  private xArray: any[] // BN[]
-  private send: (msg: Uint8Array, streamID: number) => void
+  private zArray: Uint8Array[] // BN[]
+  private xArray: Uint8Array[] // BN[]
+  private send: (msg: IMessage) => void
 
   constructor(
     memberJoinSource: Observable<{ myId: number; id: number }>,
     memberLeaveSource: Observable<{ myId: number; id: number }>,
     groupStatusSource: Observable<{ myId: number; status: GroupStatus }>,
-    messageSource: Observable<{}>,
+    messageSource: Observable<{ id: number; content: Uint8Array }>,
     send: (msg: Uint8Array, streamID: number) => void
   ) {
     this.step = Step.WAITING_Z
@@ -52,12 +53,16 @@ export class KeyAgreementBD {
     this.zArray = []
     this.xArray = []
     this.groupStatus = GroupStatus.LEFT
-    this.send = send
+    this.send = (message: IMessage) => {
+      const messageEncoded = Message.encode(Message.create(message)).finish()
+      send(messageEncoded, KeyAgreementBD.STREAM_ID)
+    }
 
     // Subscribe to network events
     this.setMemberJoinSource(memberJoinSource)
     this.setMemberLeaveSource(memberLeaveSource)
     this.setGroupStatusSource(groupStatusSource)
+    this.setMessageSource(messageSource)
   }
 
   dispose() {
@@ -150,6 +155,27 @@ export class KeyAgreementBD {
     )
   }
 
+  private setMessageSource(messageSource: Observable<{ id: number; content: Uint8Array }>) {
+    this.subs.push(
+      messageSource.subscribe(({ id, content }) => {
+        const message = Message.decode(content)
+        switch (message.type) {
+          case 'z':
+            this.updateZArray(id, message.z)
+            break
+          case 'x':
+            break
+
+          case 'restart':
+            break
+
+          default:
+            break
+        }
+      })
+    )
+  }
+
   private startCommonCycle() {}
 
   private startInitiatorCycle() {
@@ -157,7 +183,7 @@ export class KeyAgreementBD {
     this.zArray = new Array(this.members.length)
     this.zArray[0] = keyAgreementCrypto.computeZi(this.r)
     this.xArray = new Array(this.members.length)
-    this.send(this.zArray[0], KeyAgreementBD.STREAM_ID)
+    this.send({ z: this.zArray[0] })
   }
 
   private startCycle() {
@@ -166,5 +192,13 @@ export class KeyAgreementBD {
     } else {
       this.startCommonCycle()
     }
+  }
+
+  private updateZArray(id: number, z: Uint8Array) {
+    const index = this.members.indexOf(id)
+    if (!this.zArray[index]) {
+      console.log('SHOULD NEVER HAPPEN')
+    }
+    this.zArray[index] = z
   }
 }

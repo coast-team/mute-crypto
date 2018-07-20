@@ -24,6 +24,7 @@
   "homepage": "https://github.com/coast-team/mute-crypto#readme",
   "scripts": {
     "build": "rm -rf dist && tsc --outDir dist/commonjs -m commonjs",
+    "post-build": "mkdir dist/proto && cp src/proto/*.proto dist/proto",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint --fix -p tsconfig.json 'src/**/*.ts' && prettier --write --list-different 'src/**/*.ts' './*.{ts,js,json,md}'  && markdownlint ./*.md -i 'CHANGELOG.md'",
     "cz": "git-cz",
@@ -31,10 +32,13 @@
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "prerelease": "npm run build && git add dist/*",
     "release": "standard-version --no-verify",
-    "publish": "npm publish --access public"
+    "publish": "npm publish --access public",
+    "proto": "pbjs -t static-module -w es6 --no-verify --no-delimited --no-convert -o src/proto/index.js src/proto/index.proto",
+    "postproto": "pbts -o src/proto/index.d.ts src/proto/index.js"
   },
   "dependencies": {
-    "crypto-api-wrapper": "^0.6.3",
+    "crypto-api-wrapper": "^0.6.4",
+    "protobufjs": "^6.8.8",
     "rxjs": "^6.2.2"
   },
   "devDependencies": {
@@ -48,7 +52,7 @@
     "prettier": "^1.13.7",
     "standard-version": "^4.4.0",
     "tslint": "^5.10.0",
-    "tslint-config-prettier": "^1.13.0",
+    "tslint-config-prettier": "^1.14.0",
     "typescript": "^2.9.2",
     "validate-commit-msg": "^2.14.0"
   },
