@@ -8,6 +8,9 @@ yarn-error.log*
 # VS live share
 .vs
 
+// Bundles
+dist
+
 # Runtime data
 pids
 *.pid
