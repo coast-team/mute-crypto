@@ -1,3 +1,4 @@
 package.json
 package-lock.json
 CHANGELOG.md
+src/proto/index.d.ts
