@@ -8,8 +8,11 @@ yarn-error.log*
 # VS live share
 .vs
 
-// Bundles
+# Bundles
 dist
+
+# other
+.rpt2_cache
 
 # Runtime data
 pids
