@@ -3,22 +3,11 @@ import resolve from 'rollup-plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
 import cleanup from 'rollup-plugin-cleanup'
 
-const tsConfigEs5 = {
-  tsconfigOverride: {
-    compilerOptions: {
-      removeComments: true,
-      sourceMap: true,
-    },
-  },
-}
-
 const tsConfigEs2015 = {
   tsconfigOverride: {
     compilerOptions: {
       target: 'es2015',
       downlevelIteration: false,
-      removeComments: true,
-      sourceMap: true,
     },
   },
 }
@@ -28,8 +17,6 @@ const tsConfigEsNext = {
     compilerOptions: {
       target: 'esnext',
       downlevelIteration: false,
-      removeComments: true,
-      sourceMap: true,
     },
   },
 }
@@ -39,8 +26,6 @@ const tsConfigDeclaration = {
   tsconfigOverride: {
     compilerOptions: {
       declaration: true,
-      removeComments: true,
-      sourceMap: true,
     },
   },
   include: ['src/**/*.ts'],
@@ -58,7 +43,7 @@ export default [
         sourcemap: true,
       },
     ],
-    plugins: [typescript(tsConfigEs5), resolve(), filesize(filesizeConfig), cleanup()],
+    plugins: [typescript(), resolve(), filesize(filesizeConfig), cleanup()],
   },
   {
     input: 'src/index.ts',

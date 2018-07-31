@@ -2,8 +2,8 @@ import * as $protobuf from "protobufjs";
 /** Properties of a Message. */
 export interface IMessage {
 
-    /** Message restart */
-    restart?: (IInitiator|null);
+    /** Message initiator */
+    initiator?: (IInitiator|null);
 
     /** Message z */
     z?: (Uint8Array|null);
@@ -40,8 +40,8 @@ export class Message implements IMessage {
      */
     public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Message;
 
-    /** Message restart. */
-    public restart?: (IInitiator|null);
+    /** Message initiator. */
+    public initiator?: (IInitiator|null);
 
     /** Message z. */
     public z: Uint8Array;
@@ -50,7 +50,7 @@ export class Message implements IMessage {
     public x: Uint8Array;
 
     /** Message type. */
-    public type?: ("restart"|"z"|"x");
+    public type?: ("z"|"x");
 
     /**
      * Constructs a new Message.
@@ -62,8 +62,11 @@ export class Message implements IMessage {
 /** Properties of an Initiator. */
 export interface IInitiator {
 
-    /** Initiator z */
-    z?: (Uint8Array|null);
+    /** Initiator id */
+    id?: (number|null);
+
+    /** Initiator counter */
+    counter?: (number|null);
 
     /** Initiator members */
     members?: (number[]|null);
@@ -97,8 +100,11 @@ export class Initiator implements IInitiator {
      */
     public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Initiator;
 
-    /** Initiator z. */
-    public z: Uint8Array;
+    /** Initiator id. */
+    public id: number;
+
+    /** Initiator counter. */
+    public counter: number;
 
     /** Initiator members. */
     public members: number[];

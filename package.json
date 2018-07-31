@@ -41,7 +41,7 @@
     "postproto": "rollup -c rollup.config.proto.js"
   },
   "dependencies": {
-    "crypto-api-wrapper": "^0.6.4"
+    "crypto-api-wrapper": "^0.6.5"
   },
   "peerDependencies": {
     "rxjs": "^6.2.2"
@@ -53,12 +53,12 @@
     "cz-conventional-changelog": "^2.1.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.2.0",
-    "markdownlint-cli": "^0.11.0",
-    "prettier": "^1.13.7",
+    "markdownlint-cli": "^0.12.0",
+    "prettier": "^1.14.0",
     "protobufjs": "^6.8.8",
     "rollup": "^0.63.4",
     "rollup-plugin-cleanup": "^3.0.0",
-    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-commonjs": "^9.1.4",
     "rollup-plugin-filesize": "^4.0.1",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-re": "^1.0.7",
@@ -66,7 +66,7 @@
     "standard-version": "^4.4.0",
     "tslint": "^5.10.0",
     "tslint-config-prettier": "^1.14.0",
-    "typescript": "^2.9.2",
+    "typescript": "^3.0.1",
     "validate-commit-msg": "^2.14.0"
   },
   "commitlint": {

@@ -1,14 +1,15 @@
 syntax = "proto3";
 
 message Message {
+  Initiator initiator = 1;
   oneof type {
-    Initiator restart = 1;
     bytes z = 2;
     bytes x = 3;
   }
 }
 
 message Initiator {
-  bytes z = 1;
-  repeated uint32 members = 2;
+  uint32 id = 1;
+  uint32 counter = 2;
+  repeated uint32 members = 3;
 }

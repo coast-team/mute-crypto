@@ -1299,12 +1299,12 @@ var Message = $root.Message = (function () {
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-    Message.prototype.restart = null;
+    Message.prototype.initiator = null;
     Message.prototype.z = $util.newBuffer([]);
     Message.prototype.x = $util.newBuffer([]);
     var $oneOfFields;
     Object.defineProperty(Message.prototype, "type", {
-        get: $util.oneOfGetter($oneOfFields = ["restart", "z", "x"]),
+        get: $util.oneOfGetter($oneOfFields = ["z", "x"]),
         set: $util.oneOfSetter($oneOfFields)
     });
     Message.create = function create(properties) {
@@ -1313,8 +1313,8 @@ var Message = $root.Message = (function () {
     Message.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.restart != null && message.hasOwnProperty("restart"))
-            $root.Initiator.encode(message.restart, writer.uint32(10).fork()).ldelim();
+        if (message.initiator != null && message.hasOwnProperty("initiator"))
+            $root.Initiator.encode(message.initiator, writer.uint32(10).fork()).ldelim();
         if (message.z != null && message.hasOwnProperty("z"))
             writer.uint32(18).bytes(message.z);
         if (message.x != null && message.hasOwnProperty("x"))
@@ -1329,7 +1329,7 @@ var Message = $root.Message = (function () {
             var tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.restart = $root.Initiator.decode(reader, reader.uint32());
+                    message.initiator = $root.Initiator.decode(reader, reader.uint32());
                     break;
                 case 2:
                     message.z = reader.bytes();
@@ -1354,7 +1354,8 @@ var Initiator = $root.Initiator = (function () {
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-    Initiator.prototype.z = $util.newBuffer([]);
+    Initiator.prototype.id = 0;
+    Initiator.prototype.counter = 0;
     Initiator.prototype.members = $util.emptyArray;
     Initiator.create = function create(properties) {
         return new Initiator(properties);
@@ -1362,10 +1363,12 @@ var Initiator = $root.Initiator = (function () {
     Initiator.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.z != null && message.hasOwnProperty("z"))
-            writer.uint32(10).bytes(message.z);
+        if (message.id != null && message.hasOwnProperty("id"))
+            writer.uint32(8).uint32(message.id);
+        if (message.counter != null && message.hasOwnProperty("counter"))
+            writer.uint32(16).uint32(message.counter);
         if (message.members != null && message.members.length) {
-            writer.uint32(18).fork();
+            writer.uint32(26).fork();
             for (var i = 0; i < message.members.length; ++i)
                 writer.uint32(message.members[i]);
             writer.ldelim();
@@ -1380,9 +1383,12 @@ var Initiator = $root.Initiator = (function () {
             var tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.z = reader.bytes();
+                    message.id = reader.uint32();
                     break;
                 case 2:
+                    message.counter = reader.uint32();
+                    break;
+                case 3:
                     if (!(message.members && message.members.length))
                         message.members = [];
                     if ((tag & 7) === 2) {
