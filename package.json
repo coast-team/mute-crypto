@@ -7,6 +7,9 @@
   "es2015": "dist/mute-crypto.es2015.esm.js",
   "esnext": "dist/mute-crypto.esnext.esm.js",
   "types": "dist/types/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/coast-team/mute-crypto.git"
