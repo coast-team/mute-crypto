@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.1.1"></a>
+## [0.1.1](https://github.com/coast-team/mute-crypto/compare/v0.1.0...v0.1.1) (2018-07-31)
+
+
+### Bug Fixes
+
+* **pack:** remove unnecessary files from package ([a9cc62e](https://github.com/coast-team/mute-crypto/commit/a9cc62e))
+
+
+
 <a name="0.1.0"></a>
 # [0.1.0](https://github.com/coast-team/mute-crypto/compare/v0.0.2...v0.1.0) (2018-07-31)
 
