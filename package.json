@@ -46,9 +46,6 @@
   "dependencies": {
     "crypto-api-wrapper": "^0.6.5"
   },
-  "peerDependencies": {
-    "rxjs": "^6.2.2"
-  },
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",
     "@commitlint/config-conventional": "^7.0.1",

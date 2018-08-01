@@ -1,14 +1,14 @@
 import { symmetricCrypto } from 'crypto-api-wrapper'
 
-import { KeyStatus } from './KeyStatus'
+import { KeyState } from './KeyState'
 
 export class SymmetricCrypto {
-  public status: KeyStatus
+  public status: KeyState
   private key: CryptoKey | undefined
 
   constructor() {
     this.key = undefined
-    this.status = KeyStatus.UNDEFINED
+    this.status = KeyState.UNDEFINED
   }
 
   async generateKey(): Promise<string> {
@@ -19,18 +19,18 @@ export class SymmetricCrypto {
 
   async importKey(key: string): Promise<void> {
     this.key = await symmetricCrypto.importKey(symmetricCrypto.fromB64(key))
-    this.status = KeyStatus.READY
+    this.status = KeyState.READY
   }
 
   async encrypt(msg: Uint8Array): Promise<Uint8Array> {
-    if (this.key && this.status === KeyStatus.READY) {
+    if (this.key && this.status === KeyState.READY) {
       return symmetricCrypto.encrypt(msg, this.key)
     }
     throw new Error('Cryptographic key is not ready yet.')
   }
 
   async decrypt(ciphertext: Uint8Array): Promise<Uint8Array> {
-    if (this.key && this.status === KeyStatus.READY) {
+    if (this.key && this.status === KeyState.READY) {
       return symmetricCrypto.decrypt(ciphertext, this.key)
     }
     throw new Error('Cryptographic key is not ready yet.')

@@ -1,4 +1,3 @@
-export { KeyStatus } from './KeyStatus'
+export { KeyState } from './KeyState'
 export { SymmetricCrypto } from './SymmetricCrypto'
 export { KeyAgreementBD } from './keyAgreementBD/KeyAgreementBD'
-export { GroupStatus } from './GroupStatus'

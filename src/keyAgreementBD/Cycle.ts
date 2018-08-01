@@ -1,21 +1,18 @@
-import { Observable, Subject } from 'rxjs'
-
 import { BN, keyAgreementCrypto } from 'crypto-api-wrapper'
-import { IMessage, Initiator, Message } from '../proto/index'
+
+import { IMessage, Initiator, Message } from '../proto'
+import { Key } from './Key'
 import { Step } from './Step'
 
 export let myCounter = 0
 
-export interface KeyId {
-  id: number
-  counter: number
-}
-
 export class Cycle {
   public isInitiator: boolean
   public step: Step
+  public onStepChange: (step: Step) => void
+  public key: Key | undefined
+  public previousKey: Key | undefined
 
-  private stepSubject: Subject<{ step: Step; key?: CryptoKey; keyId?: KeyId }>
   private _myId: number
   private send: (msg: IMessage) => void
   private data: Map<number, IData>
@@ -25,14 +22,10 @@ export class Cycle {
     this.isInitiator = false
     this.data = new Map()
     this.members = []
+    this.onStepChange = () => {}
     this._myId = 0
-    this.stepSubject = new Subject()
     this.send = send
     this.step = Step.INITIALIZED
-  }
-
-  get onStepChange(): Observable<{ step: Step; key?: CryptoKey; keyId?: KeyId }> {
-    return this.stepSubject.asObservable()
   }
 
   get myId(): number {
@@ -98,7 +91,7 @@ export class Cycle {
       })
 
       this.send({ initiator: { id: this._myId, counter, members: this.members }, z: zArray[0] })
-      this.updateStep(Step.WAITING_Z)
+      this.setStep(Step.WAITING_Z)
       console.log('MUTE-CRYPTO: BROADCAST my Z value', this.toString())
     }
   }
@@ -117,7 +110,7 @@ export class Cycle {
       this.data.set(id, cycleData)
 
       this.send({ initiator: { id, counter, members }, z })
-      this.updateStep(Step.WAITING_Z)
+      this.setStep(Step.WAITING_Z)
       console.log('MUTE-CRYPTO: onMessage -> creating a new cycle entry & BROADCAST my Z value', {
         cycle: this.dataToString(cycleData),
         allCycles: this.toString(),
@@ -151,15 +144,6 @@ export class Cycle {
         this.checkXArray(cycleData)
         break
       }
-    }
-  }
-
-  private updateStep(step: Step, ready?: { key: CryptoKey; keyId: KeyId }) {
-    this.step = step
-    if (ready) {
-      this.stepSubject.next({ step, key: ready.key, keyId: ready.keyId })
-    } else {
-      this.stepSubject.next({ step })
     }
   }
 
@@ -214,7 +198,7 @@ export class Cycle {
     xArray[myIndex] = x
 
     this.send({ initiator: { id, counter, members: initiatorMembers }, x })
-    this.updateStep(Step.WAITING_X)
+    this.setStep(Step.WAITING_X)
     console.log('MUTE-CRYPTO: checkZArray -> BROADCAST my X value', {
       cycle: this.dataToString(data),
       allCycles: this.toString(),
@@ -257,12 +241,13 @@ export class Cycle {
       zArray[zLeft],
       xArray
     )
-    const key = await keyAgreementCrypto.deriveKey(sharedKey)
-    const keyId = { id, counter }
 
-    // const decoder = new TextDecoder()
-    this.updateStep(Step.READY, { key, keyId })
+    if (this.key) {
+      this.previousKey = this.key
+    }
+    this.key = new Key(await keyAgreementCrypto.deriveKey(sharedKey), { id, counter })
     this.data.delete(id)
+    this.setStep(Step.READY)
     console.log('MUTE-CRYPTO: SUCCESS -> a key has been created: ', this.dataToString(data))
   }
 
@@ -283,6 +268,13 @@ export class Cycle {
         x.forEach((v) => (res += String.fromCharCode(v)))
         return window.btoa(res)
       }),
+    }
+  }
+
+  private setStep(step: Step) {
+    if (this.step !== step) {
+      this.step = step
+      this.onStepChange(step)
     }
   }
 }

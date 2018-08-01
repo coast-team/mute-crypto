@@ -52,7 +52,7 @@ export default [
       format: 'es',
       sourcemap: true,
     },
-    external: ['rxjs', 'rxjs/operators', 'crypto-api-wrapper'],
+    external: ['crypto-api-wrapper'],
     plugins: [typescript(tsConfigDeclaration), filesize(filesizeConfig), cleanup()],
   },
   {
@@ -62,7 +62,7 @@ export default [
       format: 'es',
       sourcemap: true,
     },
-    external: ['rxjs', 'rxjs/operators', 'crypto-api-wrapper'],
+    external: ['crypto-api-wrapper'],
     plugins: [typescript(tsConfigEs2015), filesize(filesizeConfig), cleanup()],
   },
   {
@@ -72,7 +72,7 @@ export default [
       format: 'es',
       sourcemap: true,
     },
-    external: ['rxjs', 'rxjs/operators', 'crypto-api-wrapper'],
+    external: ['crypto-api-wrapper'],
     plugins: [typescript(tsConfigEsNext), filesize(filesizeConfig), cleanup()],
   },
 ]
