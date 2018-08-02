@@ -245,7 +245,7 @@ export class Cycle {
     if (this.key) {
       this.previousKey = this.key
     }
-    this.key = new Key(await keyAgreementCrypto.deriveKey(sharedKey), { id, counter })
+    this.key = new Key(await keyAgreementCrypto.deriveKey(sharedKey), id, counter)
     this.data.delete(id)
     this.setStep(Step.READY)
     console.log('MUTE-CRYPTO: SUCCESS -> a key has been created: ', this.dataToString(data))

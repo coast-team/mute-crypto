@@ -1,14 +1,15 @@
 export class Key {
-  public id: KeyId
+  public initiatorId: number
+  public initiatorCounter: number
   public value: CryptoKey
 
-  constructor(key: CryptoKey, keyId: KeyId) {
+  constructor(key: CryptoKey, initiatorId: number, initiatorCounter: number) {
     this.value = key
-    this.id = keyId
+    this.initiatorId = initiatorId
+    this.initiatorCounter = initiatorCounter
   }
-}
 
-export interface KeyId {
-  id: number
-  counter: number
+  isEqual(initiatorId: number, initiatorCounter: number): boolean {
+    return this.initiatorId === initiatorId && this.initiatorCounter === initiatorCounter
+  }
 }

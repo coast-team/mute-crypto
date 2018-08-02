@@ -41,17 +41,32 @@ export class KeyAgreementBD {
   }
 
   async encrypt(msg: Uint8Array): Promise<Uint8Array> {
-    if (this.cycle.key && this.state === KeyState.READY) {
+    if (this.cycle.key) {
       return symmetricCrypto.encrypt(msg, this.cycle.key.value)
     }
-    throw new Error('Cryptographic key is not ready yet.')
+    throw new Error('Failed to ecnrypt a message: cryptographic key is not ready yet')
   }
 
-  async decrypt(ciphertext: Uint8Array): Promise<Uint8Array> {
-    if (this.cycle.key && this.state === KeyState.READY) {
-      return symmetricCrypto.decrypt(ciphertext, this.cycle.key.value)
+  async decrypt(
+    ciphertext: Uint8Array,
+    initiatorId?: number,
+    initiatorCounter?: number
+  ): Promise<Uint8Array> {
+    if (this.cycle.key) {
+      if (initiatorId && initiatorCounter) {
+        if (this.cycle.key.isEqual(initiatorId, initiatorCounter)) {
+          return symmetricCrypto.decrypt(ciphertext, this.cycle.key.value)
+        } else if (
+          this.cycle.previousKey &&
+          this.cycle.previousKey.isEqual(initiatorId, initiatorCounter)
+        ) {
+          return symmetricCrypto.decrypt(ciphertext, this.cycle.previousKey.value)
+        }
+      } else {
+        return symmetricCrypto.decrypt(ciphertext, this.cycle.key.value)
+      }
     }
-    throw new Error('Cryptographic key is not ready yet.')
+    throw new Error('Failed to decrypt a message')
   }
 
   public addMember(id: number) {
