@@ -1,5 +1,6 @@
 import { BN, keyAgreementCrypto } from 'crypto-api-wrapper'
 
+import { assert, log } from '../debug'
 import { IMessage, Initiator, Message } from '../proto'
 import { Key } from './Key'
 import { Step } from './Step'
@@ -39,6 +40,7 @@ export class Cycle {
     }
   }
 
+  // For debugging
   public toString() {
     const cycles = []
     for (const d of this.data.values()) {
@@ -69,8 +71,8 @@ export class Cycle {
 
   public start() {
     if (this.members.length > 1) {
-      console.assert(this.isInitiator, 'Start a cycle by a none initiator')
-      console.assert(
+      assert(this.isInitiator, 'Start a cycle by a none initiator')
+      assert(
         !this.data.has(this.myId) ||
           ((this.data.get(this.myId) as IData).counter !== myCounter) === undefined,
         'Start the same cycle twice'
@@ -92,7 +94,7 @@ export class Cycle {
 
       this.send({ initiator: { id: this._myId, counter, members: this.members }, z: zArray[0] })
       this.setStep(Step.WAITING_Z)
-      console.log('MUTE-CRYPTO: BROADCAST my Z value', this.toString())
+      log.debug('MUTE-CRYPTO: BROADCAST my Z value', this.toString())
     }
   }
 
@@ -111,7 +113,7 @@ export class Cycle {
 
       this.send({ initiator: { id, counter, members }, z })
       this.setStep(Step.WAITING_Z)
-      console.log('MUTE-CRYPTO: onMessage -> creating a new cycle entry & BROADCAST my Z value', {
+      log.debug('MUTE-CRYPTO: onMessage -> creating a new cycle entry & BROADCAST my Z value', {
         cycle: this.dataToString(cycleData),
         allCycles: this.toString(),
       })
@@ -119,10 +121,10 @@ export class Cycle {
     switch (msg.type) {
       case 'z': {
         const index = cycleData.members.indexOf(senderId)
-        console.assert(index !== -1, 'Unable to find a corresponding Z value of ', senderId)
-        console.assert(cycleData.zArray[index] === undefined, 'Setting Z value twice')
+        assert(index !== -1, 'Unable to find a corresponding Z value of ', senderId)
+        assert(cycleData.zArray[index] === undefined, 'Setting Z value twice')
         cycleData.zArray[index] = msg.z
-        console.log('MUTE-CRYPTO: receive Z value', {
+        log.debug('MUTE-CRYPTO: receive Z value', {
           senderId,
           senderIndex: index,
           cycle: this.dataToString(cycleData),
@@ -133,10 +135,10 @@ export class Cycle {
       case 'x': {
         const index = cycleData.members.indexOf(senderId)
 
-        console.assert(index !== -1, 'Unable to find a corresponding X value of ', senderId)
-        console.assert(cycleData.xArray[index] === undefined, 'Setting X value twice')
+        assert(index !== -1, 'Unable to find a corresponding X value of ', senderId)
+        assert(cycleData.xArray[index] === undefined, 'Setting X value twice')
         cycleData.xArray[index] = msg.x
-        console.log('MUTE-CRYPTO: receive X value', {
+        log.debug('MUTE-CRYPTO: receive X value', {
           senderId,
           senderIndex: index,
           cycle: this.dataToString(cycleData),
@@ -165,7 +167,7 @@ export class Cycle {
   private checkZArray(data: IData) {
     const { id, counter, members: initiatorMembers, zArray, xArray, r } = data
     if (this.members.length < initiatorMembers.length) {
-      console.log(
+      log.debug(
         '______MUTE-CRYPTO: checkZArray abort -> length of members are different',
         this.dataToString(data)
       )
@@ -173,7 +175,7 @@ export class Cycle {
     }
     for (const m of initiatorMembers) {
       if (!this.members.includes(m)) {
-        console.log(
+        log.debug(
           '______MUTE-CRYPTO: checkZArray abort -> missing a member',
           this.dataToString(data)
         )
@@ -182,7 +184,7 @@ export class Cycle {
     }
     for (const z of zArray) {
       if (z === undefined) {
-        console.log(
+        log.debug(
           '______MUTE-CRYPTO: checkZArray abort -> missing Z value',
           this.dataToString(data)
         )
@@ -194,12 +196,12 @@ export class Cycle {
     const zRight = (myIndex + 1) % initiatorMembers.length
     const zLeft = (initiatorMembers.length + myIndex - 1) % initiatorMembers.length
     const x = keyAgreementCrypto.computeXi(r, zArray[zRight], zArray[zLeft])
-    console.assert(xArray[myIndex] === undefined, 'Setting my X value twice')
+    assert(xArray[myIndex] === undefined, 'Setting my X value twice')
     xArray[myIndex] = x
 
     this.send({ initiator: { id, counter, members: initiatorMembers }, x })
     this.setStep(Step.WAITING_X)
-    console.log('MUTE-CRYPTO: checkZArray -> BROADCAST my X value', {
+    log.debug('MUTE-CRYPTO: checkZArray -> BROADCAST my X value', {
       cycle: this.dataToString(data),
       allCycles: this.toString(),
     })
@@ -208,7 +210,7 @@ export class Cycle {
   private async checkXArray(data: IData) {
     const { id, counter, members: initiatorMembers, zArray, xArray, r } = data
     if (this.members.length < initiatorMembers.length) {
-      console.log(
+      log.debug(
         '______MUTE-CRYPTO: checkXArray abort -> length of members are different',
         this.dataToString(data)
       )
@@ -216,7 +218,7 @@ export class Cycle {
     }
     for (const m of initiatorMembers) {
       if (!this.members.includes(m)) {
-        console.log(
+        log.debug(
           '______MUTE-CRYPTO: checkXArray abort -> missing a member',
           this.dataToString(data)
         )
@@ -225,7 +227,7 @@ export class Cycle {
     }
     for (const x of xArray) {
       if (x === undefined) {
-        console.log(
+        log.debug(
           '______MUTE-CRYPTO: checkXArray abort -> missing X value',
           this.dataToString(data)
         )
@@ -248,9 +250,10 @@ export class Cycle {
     this.key = new Key(await keyAgreementCrypto.deriveKey(sharedKey), id, counter)
     this.data.delete(id)
     this.setStep(Step.READY)
-    console.log('MUTE-CRYPTO: SUCCESS -> a key has been created: ', this.dataToString(data))
+    log.debug('MUTE-CRYPTO: SUCCESS -> a key has been created: ', this.dataToString(data))
   }
 
+  // For debugging
   private dataToString(data: IData): object {
     return {
       myId: this._myId,

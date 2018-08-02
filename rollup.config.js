@@ -2,6 +2,7 @@ import filesize from 'rollup-plugin-filesize'
 import resolve from 'rollup-plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
 import cleanup from 'rollup-plugin-cleanup'
+import strip from 'rollup-plugin-strip'
 
 const tsConfigEs2015 = {
   tsconfigOverride: {

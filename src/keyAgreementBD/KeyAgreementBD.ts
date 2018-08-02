@@ -1,4 +1,6 @@
 import { symmetricCrypto } from 'crypto-api-wrapper'
+
+import { log } from '../debug'
 import { KeyState } from '../KeyState'
 import { IMessage, Message } from '../proto/index'
 import { Cycle } from './Cycle'
@@ -30,7 +32,7 @@ export class KeyAgreementBD {
           break
         case Step.READY:
           symmetricCrypto.exportKey((this.cycle.key as Key).value).then((jsonWebKey) => {
-            console.log('MUTE-CRYPTO: KEY IS READY -> ', symmetricCrypto.toB64(jsonWebKey))
+            log.debug('MUTE-CRYPTO: KEY IS READY -> ', symmetricCrypto.toB64(jsonWebKey))
           })
           this.setState(KeyState.READY)
           break
@@ -72,7 +74,7 @@ export class KeyAgreementBD {
   public addMember(id: number) {
     this.cycle.addMember(id)
     if (this.isReady && this.cycle.isInitiator) {
-      console.log('MUTE-CRYPTO: new member has JOINED -> start cycle', this.cycle.toString())
+      log.debug('MUTE-CRYPTO: new member has JOINED -> start cycle', this.cycle.toString())
       this.cycle.start()
     }
   }
@@ -80,7 +82,7 @@ export class KeyAgreementBD {
   public removeMember(id: number) {
     this.cycle.deleteMember(id)
     if (this.isReady && this.cycle.isInitiator) {
-      console.log('MUTE-CRYPTO: new member has LEFT -> start cycle', this.cycle.toString())
+      log.debug('MUTE-CRYPTO: new member has LEFT -> start cycle', this.cycle.toString())
       this.cycle.start()
     }
   }
@@ -96,7 +98,7 @@ export class KeyAgreementBD {
   public setReady() {
     this.isReady = true
     if (this.cycle.isInitiator && this.cycle.step === Step.INITIALIZED) {
-      console.log('MUTE-CRYPTO: I have JOINED the group -> start cycle', this.cycle.toString())
+      log.debug('MUTE-CRYPTO: I have JOINED the group -> start cycle', this.cycle.toString())
       this.cycle.start()
     }
   }
