@@ -79,7 +79,7 @@ export class KeyAgreementBD {
 
   public removeMember(id: number) {
     this.cycle.deleteMember(id)
-    if (this.cycle.isInitiator && this.cycle.step !== Step.READY) {
+    if (this.isReady && this.cycle.isInitiator) {
       console.log('MUTE-CRYPTO: new member has LEFT -> start cycle', this.cycle.toString())
       this.cycle.start()
     }
