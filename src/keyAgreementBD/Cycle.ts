@@ -76,11 +76,6 @@ export class Cycle {
   public start() {
     if (this.members.length > 1) {
       assert(this.isInitiator, 'Start a cycle by a none initiator')
-      assert(
-        !this.data.has(this.myId) ||
-          ((this.data.get(this.myId) as IData).counter !== myCounter) === undefined,
-        'Start the same cycle twice'
-      )
 
       const r = keyAgreementCrypto.generateRi()
       const zArray = new Array(this.members.length)
