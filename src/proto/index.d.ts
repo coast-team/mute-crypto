@@ -115,3 +115,60 @@ export class Initiator implements IInitiator {
      */
     constructor(properties?: IInitiator);
 }
+
+/** Properties of a CipherMessage. */
+export interface ICipherMessage {
+
+    /** CipherMessage id */
+    id?: (number|null);
+
+    /** CipherMessage counter */
+    counter?: (number|null);
+
+    /** CipherMessage content */
+    content?: (Uint8Array|null);
+}
+
+/** Represents a CipherMessage. */
+export class CipherMessage implements ICipherMessage {
+
+    /**
+     * Creates a new CipherMessage instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns CipherMessage instance
+     */
+    public static create(properties?: ICipherMessage): CipherMessage;
+
+    /**
+     * Encodes the specified CipherMessage message. Does not implicitly {@link CipherMessage.verify|verify} messages.
+     * @param message CipherMessage message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: ICipherMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes a CipherMessage message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns CipherMessage
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): CipherMessage;
+
+    /** CipherMessage id. */
+    public id: number;
+
+    /** CipherMessage counter. */
+    public counter: number;
+
+    /** CipherMessage content. */
+    public content: Uint8Array;
+
+    /**
+     * Constructs a new CipherMessage.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: ICipherMessage);
+}

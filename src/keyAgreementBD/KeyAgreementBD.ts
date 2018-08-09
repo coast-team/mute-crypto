@@ -2,14 +2,13 @@ import { symmetricCrypto } from 'crypto-api-wrapper'
 
 import { log } from '../debug'
 import { KeyState } from '../KeyState'
-import { IMessage, Message } from '../proto/index'
+import { CipherMessage, IMessage, Message } from '../proto/index'
+import { Streams } from '../Streams'
 import { Cycle } from './Cycle'
 import { Key } from './Key'
 import { Step } from './Step'
 
 export class KeyAgreementBD {
-  public static STREAM_ID = 700
-
   public state: KeyState
   public onStateChange: (state: KeyState) => void
 
@@ -20,7 +19,7 @@ export class KeyAgreementBD {
     this.isReady = false
     this.onStateChange = () => {}
     this.cycle = new Cycle((msg: IMessage) =>
-      send(Message.encode(Message.create(msg)).finish(), KeyAgreementBD.STREAM_ID)
+      send(Message.encode(Message.create(msg)).finish(), Streams.KEY_AGREEMENT_BD)
     )
     this.state = KeyState.UNDEFINED
 
@@ -44,28 +43,25 @@ export class KeyAgreementBD {
 
   async encrypt(msg: Uint8Array): Promise<Uint8Array> {
     if (this.cycle.key) {
-      return symmetricCrypto.encrypt(msg, this.cycle.key.value)
+      const content = await symmetricCrypto.encrypt(msg, this.cycle.key.value)
+      return CipherMessage.encode(
+        CipherMessage.create({
+          id: this.cycle.key.initiatorId,
+          counter: this.cycle.key.initiatorCounter,
+          content,
+        })
+      ).finish()
     }
     throw new Error('Failed to ecnrypt a message: cryptographic key is not ready yet')
   }
 
-  async decrypt(
-    ciphertext: Uint8Array,
-    initiatorId?: number,
-    initiatorCounter?: number
-  ): Promise<Uint8Array> {
+  async decrypt(ciphermsg: Uint8Array): Promise<Uint8Array> {
     if (this.cycle.key) {
-      if (initiatorId && initiatorCounter) {
-        if (this.cycle.key.isEqual(initiatorId, initiatorCounter)) {
-          return symmetricCrypto.decrypt(ciphertext, this.cycle.key.value)
-        } else if (
-          this.cycle.previousKey &&
-          this.cycle.previousKey.isEqual(initiatorId, initiatorCounter)
-        ) {
-          return symmetricCrypto.decrypt(ciphertext, this.cycle.previousKey.value)
-        }
-      } else {
-        return symmetricCrypto.decrypt(ciphertext, this.cycle.key.value)
+      const { id, counter, content } = CipherMessage.decode(ciphermsg)
+      if (this.cycle.key.isEqual(id, counter)) {
+        return symmetricCrypto.decrypt(content, this.cycle.key.value)
+      } else if (this.cycle.previousKey && this.cycle.previousKey.isEqual(id, counter)) {
+        return symmetricCrypto.decrypt(content, this.cycle.previousKey.value)
       }
     }
     throw new Error('Failed to decrypt a message')

@@ -1408,6 +1408,55 @@ var Initiator = $root.Initiator = (function () {
     };
     return Initiator;
 })();
+var CipherMessage = $root.CipherMessage = (function () {
+    function CipherMessage(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+    CipherMessage.prototype.id = 0;
+    CipherMessage.prototype.counter = 0;
+    CipherMessage.prototype.content = $util.newBuffer([]);
+    CipherMessage.create = function create(properties) {
+        return new CipherMessage(properties);
+    };
+    CipherMessage.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.id != null && message.hasOwnProperty("id"))
+            writer.uint32(8).uint32(message.id);
+        if (message.counter != null && message.hasOwnProperty("counter"))
+            writer.uint32(16).uint32(message.counter);
+        if (message.content != null && message.hasOwnProperty("content"))
+            writer.uint32(26).bytes(message.content);
+        return writer;
+    };
+    CipherMessage.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.CipherMessage();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.id = reader.uint32();
+                    break;
+                case 2:
+                    message.counter = reader.uint32();
+                    break;
+                case 3:
+                    message.content = reader.bytes();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    };
+    return CipherMessage;
+})();
 
 export default $root;
-export { Message, Initiator };
+export { Message, Initiator, CipherMessage };

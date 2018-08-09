@@ -13,3 +13,9 @@ message Initiator {
   uint32 counter = 2;
   repeated uint32 members = 3;
 }
+
+message CipherMessage {
+  uint32 id = 1;
+  uint32 counter = 2;
+  bytes content = 3;
+}
