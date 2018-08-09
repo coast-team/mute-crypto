@@ -34,10 +34,14 @@ export class Cycle {
   }
 
   set myId(id: number) {
-    if (this._myId === 0) {
-      this._myId = id
-      this.addMember(id)
+    const index = this.members.indexOf(this._myId)
+    if (index !== -1) {
+      this.members[index] = id
+    } else {
+      this.members.push(id)
     }
+    this._myId = id
+    this.members.sort((a, b) => a - b)
   }
 
   // For debugging
