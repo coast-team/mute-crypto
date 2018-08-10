@@ -31,7 +31,7 @@
   "homepage": "https://github.com/coast-team/mute-crypto#readme",
   "scripts": {
     "build": "rm -rf dist && rollup --config",
-    "postbuild": "mkdir -p dist/types/proto && cp src/proto/index.d.ts dist/types/proto",
+    "postbuild": "mkdir -p dist/types/keyAgreementBD/proto && cp src/keyAgreementBD/proto/index.d.ts dist/types/keyAgreementBD/proto",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint --fix -p tsconfig.json --exclude src/proto/*d.ts && prettier --write --list-different 'src/**/*.ts' './*.{ts,js,json,md}' && markdownlint ./*.md -i 'CHANGELOG.md'",
     "cz": "git-cz",
@@ -40,7 +40,7 @@
     "prerelease": "npm run build",
     "release": "standard-version --no-verify",
     "publish": "npm publish --access public",
-    "proto": "pbjs -t static-module -w es6 --no-verify --no-delimited --no-convert -o src/proto/index.js src/proto/index.proto && pbts -o src/proto/index.d.ts src/proto/index.js",
+    "proto": "pbjs -t static-module -w es6 --no-verify --no-delimited --no-convert -o src/keyAgreementBD/proto/index.js src/keyAgreementBD/proto/index.proto && pbts -o src/keyAgreementBD/proto/index.d.ts src/proto/index.js",
     "postproto": "rollup -c rollup.config.proto.js"
   },
   "dependencies": {
@@ -54,11 +54,11 @@
     "husky": "^0.14.3",
     "lint-staged": "^7.2.0",
     "markdownlint-cli": "^0.12.0",
-    "prettier": "^1.14.0",
+    "prettier": "^1.14.2",
     "protobufjs": "^6.8.8",
-    "rollup": "^0.63.5",
+    "rollup": "^0.64.1",
     "rollup-plugin-cleanup": "^3.0.0",
-    "rollup-plugin-commonjs": "^9.1.4",
+    "rollup-plugin-commonjs": "^9.1.5",
     "rollup-plugin-filesize": "^4.0.1",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-re": "^1.0.7",

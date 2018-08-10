@@ -1,36 +1,29 @@
 import { symmetricCrypto } from 'crypto-api-wrapper'
 
-import { KeyState } from './KeyState'
+import { KeyState } from '../KeyState'
+import { MuteCrypto } from '../MuteCrypto'
 
-export class SymmetricCrypto {
-  public status: KeyState
+export class Symmetric extends MuteCrypto {
   private key: CryptoKey | undefined
 
   constructor() {
+    super()
     this.key = undefined
-    this.status = KeyState.UNDEFINED
   }
-
-  async generateKey(): Promise<string> {
-    this.key = await symmetricCrypto.generateEncryptionKey()
-    const jsonWebKey = await symmetricCrypto.exportKey(this.key)
-    return symmetricCrypto.toB64(jsonWebKey)
-  }
-
   async importKey(key: string): Promise<void> {
     this.key = await symmetricCrypto.importKey(symmetricCrypto.fromB64(key))
-    this.status = KeyState.READY
+    super.setState(KeyState.READY)
   }
 
   async encrypt(msg: Uint8Array): Promise<Uint8Array> {
-    if (this.key && this.status === KeyState.READY) {
+    if (this.key) {
       return symmetricCrypto.encrypt(msg, this.key)
     }
     throw new Error('Cryptographic key is not ready yet.')
   }
 
   async decrypt(ciphertext: Uint8Array): Promise<Uint8Array> {
-    if (this.key && this.status === KeyState.READY) {
+    if (this.key) {
       return symmetricCrypto.decrypt(ciphertext, this.key)
     }
     throw new Error('Cryptographic key is not ready yet.')

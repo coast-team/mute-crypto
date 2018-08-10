@@ -6,8 +6,8 @@ import cleanup from 'rollup-plugin-cleanup'
 
 export default [
   {
-    input: 'src/proto/index.js',
-    output: [{ file: 'src/proto/index.js', format: 'es' }],
+    input: 'src/keyAgreementBD/proto/index.js',
+    output: [{ file: 'src/keyAgreementBD/proto/index.js', format: 'es' }],
     plugins: [
       replace({
         patterns: [

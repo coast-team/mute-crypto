@@ -1,5 +1,6 @@
 export { KeyState } from './KeyState'
-export { SymmetricCrypto } from './SymmetricCrypto'
+export { Symmetric } from './symmetric/Symmetric'
 export { KeyAgreementBD } from './keyAgreementBD/KeyAgreementBD'
 export { enableDebug } from './debug'
 export { Streams } from './Streams'
+export { MuteCrypto } from './MuteCrypto'

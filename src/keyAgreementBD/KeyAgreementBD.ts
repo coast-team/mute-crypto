@@ -2,41 +2,36 @@ import { symmetricCrypto } from 'crypto-api-wrapper'
 
 import { log } from '../debug'
 import { KeyState } from '../KeyState'
-import { CipherMessage, IMessage, Message } from '../proto/index'
+import { MuteCrypto } from '../MuteCrypto'
 import { Streams } from '../Streams'
 import { Cycle } from './Cycle'
 import { Key } from './Key'
+import { CipherMessage, IMessage, Message } from './proto/index'
 import { Step } from './Step'
 
-export class KeyAgreementBD {
-  public state: KeyState
-  public onStateChange: (state: KeyState) => void
-
+export class KeyAgreementBD extends MuteCrypto {
   private isReady: boolean
   private cycle: Cycle
 
-  constructor(send: (msg: Uint8Array, streamID: number) => void) {
+  constructor() {
+    super()
     this.isReady = false
-    this.onStateChange = () => {}
-    this.cycle = new Cycle((msg: IMessage) =>
-      send(Message.encode(Message.create(msg)).finish(), Streams.KEY_AGREEMENT_BD)
-    )
-    this.state = KeyState.UNDEFINED
+    this.cycle = new Cycle()
 
     // Subscribe to key
     this.cycle.onStepChange = (step) => {
       switch (step) {
         case Step.INITIALIZED:
-          this.setState(KeyState.UNDEFINED)
+          super.setState(KeyState.UNDEFINED)
           break
         case Step.READY:
           symmetricCrypto.exportKey((this.cycle.key as Key).value).then((jsonWebKey) => {
-            log.debug('MUTE-CRYPTO: KEY IS READY -> ', symmetricCrypto.toB64(jsonWebKey))
+            log.debug('KEY =', symmetricCrypto.toB64(jsonWebKey))
           })
-          this.setState(KeyState.READY)
+          super.setState(KeyState.READY)
           break
         default:
-          this.setState(KeyState.CALCUL_IN_PROGRESS)
+          super.setState(KeyState.CALCUL_IN_PROGRESS)
       }
     }
   }
@@ -67,10 +62,15 @@ export class KeyAgreementBD {
     throw new Error('Failed to decrypt a message')
   }
 
+  public set onSend(send: (msg: Uint8Array, streamID: number) => void) {
+    this.cycle.onSend = (msg: IMessage) =>
+      send(Message.encode(Message.create(msg)).finish(), Streams.KEY_AGREEMENT_BD)
+  }
+
   public addMember(id: number) {
     this.cycle.addMember(id)
     if (this.isReady && this.cycle.isInitiator) {
-      log.debug('MUTE-CRYPTO: new member has JOINED -> start cycle', this.cycle.toString())
+      log.debug('new member has JOINED -> start cycle', this.cycle.toString())
       this.cycle.start()
     }
   }
@@ -78,7 +78,7 @@ export class KeyAgreementBD {
   public removeMember(id: number) {
     this.cycle.deleteMember(id)
     if (this.isReady && this.cycle.isInitiator) {
-      log.debug('MUTE-CRYPTO: new member has LEFT -> start cycle', this.cycle.toString())
+      log.debug('new member has LEFT -> start cycle', this.cycle.toString())
       this.cycle.start()
     }
   }
@@ -94,15 +94,8 @@ export class KeyAgreementBD {
   public setReady() {
     this.isReady = true
     if (this.cycle.isInitiator && this.cycle.step === Step.INITIALIZED) {
-      log.debug('MUTE-CRYPTO: I have JOINED the group -> start cycle', this.cycle.toString())
+      log.debug('I have JOINED the group -> start cycle', this.cycle.toString())
       this.cycle.start()
-    }
-  }
-
-  private setState(state: KeyState) {
-    if (this.state !== state) {
-      this.state = state
-      this.onStateChange(this.state)
     }
   }
 }
