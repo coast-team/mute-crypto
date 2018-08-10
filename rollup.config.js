@@ -53,7 +53,7 @@ export default [
       format: 'es',
       sourcemap: true,
     },
-    external: ['crypto-api-wrapper'],
+    external: ['@coast-team/mute-crypto-helper'],
     plugins: [typescript(tsConfigDeclaration), filesize(filesizeConfig), cleanup()],
   },
   {
@@ -63,7 +63,7 @@ export default [
       format: 'es',
       sourcemap: true,
     },
-    external: ['crypto-api-wrapper'],
+    external: ['@coast-team/mute-crypto-helper'],
     plugins: [typescript(tsConfigEs2015), filesize(filesizeConfig), cleanup()],
   },
   {
@@ -73,7 +73,7 @@ export default [
       format: 'es',
       sourcemap: true,
     },
-    external: ['crypto-api-wrapper'],
+    external: ['@coast-team/mute-crypto-helper'],
     plugins: [typescript(tsConfigEsNext), filesize(filesizeConfig), cleanup()],
   },
 ]

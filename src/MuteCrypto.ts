@@ -1,4 +1,4 @@
-import { symmetricCrypto } from 'crypto-api-wrapper'
+import { symmetricCrypto } from '@coast-team/mute-crypto-helper'
 import { log } from './debug'
 import { KeyState } from './KeyState'
 

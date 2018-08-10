@@ -1,4 +1,4 @@
-import { BN, keyAgreementCrypto } from 'crypto-api-wrapper'
+import { BN, keyAgreementCrypto } from '@coast-team/mute-crypto-helper'
 
 import { assert, log, perf } from '../debug'
 import { Key } from './Key'
