@@ -1,6 +1,6 @@
 {
   "name": "@coast-team/mute-crypto",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Algorithm generating a cryptographic key for MUTE collaborative session",
   "main": "dist/mute-crypto.es5.cjs.js",
   "module": "dist/mute-crypto.es5.esm.js",
@@ -28,6 +28,9 @@
   "bugs": {
     "url": "https://github.com/coast-team/mute-crypto/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/coast-team/mute-crypto#readme",
   "scripts": {
     "build": "rm -rf dist && rollup --config",
@@ -39,7 +42,6 @@
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "prerelease": "npm run build",
     "release": "standard-version --no-verify",
-    "publish": "npm publish --access public",
     "proto": "pbjs -t static-module -w es6 --no-verify --no-delimited --no-convert -o src/keyAgreementBD/proto/index.js src/keyAgreementBD/proto/index.proto && pbts -o src/keyAgreementBD/proto/index.d.ts src/proto/index.js",
     "postproto": "rollup -c rollup.config.proto.js"
   },
@@ -52,7 +54,7 @@
     "commitizen": "^2.10.1",
     "cz-conventional-changelog": "^2.1.0",
     "husky": "^0.14.3",
-    "lint-staged": "^7.2.0",
+    "lint-staged": "^7.2.2",
     "markdownlint-cli": "^0.12.0",
     "prettier": "^1.14.2",
     "protobufjs": "^6.8.8",
