@@ -106,7 +106,7 @@ export class Cycle {
         xArray,
       })
 
-      this.send({ initiator: { id: this._myId, counter, members: this.members }, z: zArray[0] })
+      this.send({ initiator: { id: this._myId, counter, members: this.members }, z })
       this.setStep(Step.WAITING_OTHERS_Z, this._myId, counter)
       log.debug(
         this._myId +
@@ -354,7 +354,8 @@ export class Cycle {
       perf.mark('start compute secret key')
       this.key = new Key(await keyAgreementCrypto.deriveKey(sharedKey), id, counter)
       perf.mark('end compute secret key')
-      this.data.delete(id)
+      // FIXME: should be very careful on deleting data entries (only for optimization: memory leaks)
+      // this.data.delete(id)
 
       perf.mark('end-cycle')
       perf.measure('generate Ri ', 'start generate Ri', 'end generate Ri')
