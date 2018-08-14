@@ -98,7 +98,10 @@ export class Cycle {
 
       this.send({ initiator: { id: this._myId, counter, members: this.members }, z: zArray[0] })
       this.setStep(Step.WAITING_Z)
-      log.debug('broadcast my Z value', this.toString())
+      log.debug(
+        'I am initiator and I start a new cyrcle by broadcasting my Z value',
+        this.toString()
+      )
     }
   }
 
@@ -129,11 +132,7 @@ export class Cycle {
         assert(index !== -1, 'Unable to find a corresponding Z value of ', senderId)
         assert(cycleData.zArray[index] === undefined, 'Setting Z value twice')
         cycleData.zArray[index] = msg.z
-        log.debug('receive Z value', {
-          senderId,
-          senderIndex: index,
-          cycle: this.dataToString(cycleData),
-        })
+        log.debug(`received Z value from ${senderId}, ${index}: `, this.dataToString(cycleData))
         this.checkZArray(cycleData)
         break
       }
@@ -143,11 +142,7 @@ export class Cycle {
         assert(index !== -1, 'Unable to find a corresponding X value of ', senderId)
         assert(cycleData.xArray[index] === undefined, 'Setting X value twice')
         cycleData.xArray[index] = msg.x
-        log.debug('receive X value', {
-          senderId,
-          senderIndex: index,
-          cycle: this.dataToString(cycleData),
-        })
+        log.debug(`received X value from ${senderId}, ${index}: `, this.dataToString(cycleData))
         this.checkXArray(cycleData)
         break
       }
@@ -245,11 +240,12 @@ export class Cycle {
   // For debugging
   private dataToString(data: IData): object {
     return {
-      myId: this._myId,
       initiatorId: data.id,
       initiatorCounter: data.counter,
       initiatorMembers: data.members.slice(),
-      members: this.members.slice(),
+      myId: this._myId,
+      myIndex: this.members.indexOf(this._myId),
+      myMembers: this.members.slice(),
       zArray: data.zArray.map((z) => {
         let res = ''
         z.forEach((v) => (res += String.fromCharCode(v)))
