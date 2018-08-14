@@ -119,12 +119,15 @@ export class Cycle {
   }
 
   public onMessage(senderId: number, msg: Message) {
-    const { initiator } = msg as { initiator: Initiator }
-    let cycleData = this.data.get(initiator.id)
-
-    if (cycleData === undefined || cycleData.counter < initiator.counter) {
+    const {
+      initiator: { id, counter, members },
+    } = msg as { initiator: Initiator }
+    let cycleData = this.data.get(id)
+    if (!members.includes(this._myId)) {
+      return
+    }
+    if (cycleData === undefined || cycleData.counter < counter) {
       perf.mark('start-cycle')
-      const { id, counter, members } = msg.initiator as Initiator
       perf.mark('start generate Ri')
       const r = keyAgreementCrypto.generateRi()
       perf.mark('end generate Ri')
@@ -150,7 +153,7 @@ export class Cycle {
       )
     }
 
-    if (cycleData.counter === initiator.counter) {
+    if (cycleData.counter === counter) {
       switch (msg.type) {
         case 'z': {
           const index = cycleData.members.indexOf(senderId)
