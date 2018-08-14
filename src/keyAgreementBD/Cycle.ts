@@ -97,7 +97,7 @@ export class Cycle {
       })
 
       this.send({ initiator: { id: this._myId, counter, members: this.members }, z: zArray[0] })
-      this.setStep(Step.WAITING_Z)
+      this.setStep(Step.WAITING_OTHERS_Z)
       log.debug(
         'I am initiator and I start a new cyrcle by broadcasting my Z value',
         this.toString()
@@ -109,18 +109,18 @@ export class Cycle {
     const { initiator } = msg as { initiator: Initiator }
     let cycleData = this.data.get(initiator.id)
     if (cycleData === undefined || cycleData.counter < initiator.counter) {
-      const { id, counter, members } = msg.initiator as Initiator
       perf.mark('start-cycle')
+      const { id, counter, members } = msg.initiator as Initiator
       const r = keyAgreementCrypto.generateRi()
       const z = keyAgreementCrypto.computeZi(r)
       const zArray = new Array(members.length)
-      zArray[members.indexOf(this._myId)] = keyAgreementCrypto.computeZi(r)
+      zArray[members.indexOf(this._myId)] = z
       const xArray = new Array(members.length)
       cycleData = { id, counter, members, r, zArray, xArray }
       this.data.set(id, cycleData)
 
-      this.send({ initiator: { id, counter, members }, z })
-      this.setStep(Step.WAITING_Z)
+      this.checkMyZ(cycleData, z)
+
       log.debug('onMessage -> creating a new cycle entry & broadcast my Z value', {
         cycle: this.dataToString(cycleData),
         allCycles: this.toString(),
@@ -152,89 +152,114 @@ export class Cycle {
   private checkMembers() {
     this.isInitiator = this._myId <= Math.min(...this.members)
     if (!this.isInitiator) {
-      if (this.step === Step.WAITING_Z) {
-        for (const d of this.data.values()) {
-          this.checkZArray(d)
-        }
-      } else if (this.step === Step.WAITING_X) {
-        for (const d of this.data.values()) {
-          this.checkXArray(d)
-        }
+      switch (this.step) {
+        case Step.WAITING_TO_BROADCAST_Z:
+          for (const d of this.data.values()) {
+            this.checkMyZ(d, d.zArray[d.members.indexOf(this._myId)])
+          }
+          break
+        case Step.WAITING_OTHERS_Z:
+          for (const d of this.data.values()) {
+            this.checkZArray(d)
+          }
+          break
+        case Step.WAITING_OTHERS_X:
+          for (const d of this.data.values()) {
+            this.checkXArray(d)
+          }
+          break
       }
+    }
+  }
+
+  private checkMyZ(cycleData: IData, z: Uint8Array) {
+    if (cycleData.members.every((m) => this.members.includes(m))) {
+      this.send({
+        initiator: { id: cycleData.id, counter: cycleData.counter, members: cycleData.members },
+        z,
+      })
+      this.setStep(Step.WAITING_OTHERS_Z)
+      this.checkZArray(cycleData)
+    } else {
+      this.setStep(Step.WAITING_TO_BROADCAST_Z)
     }
   }
 
   private checkZArray(data: IData) {
-    const { id, counter, members: initiatorMembers, zArray, xArray, r } = data
-    if (this.members.length < initiatorMembers.length) {
-      log.debug('checkZArray abort -> length of members are different', this.dataToString(data))
-      return
-    }
-    for (const m of initiatorMembers) {
-      if (!this.members.includes(m)) {
-        log.debug('checkZArray abort -> missing a member', this.dataToString(data))
+    if (this.step === Step.WAITING_OTHERS_Z) {
+      const { id, counter, members: initiatorMembers, zArray, xArray, r } = data
+      if (this.members.length < initiatorMembers.length) {
+        log.debug('checkZArray abort -> length of members are different', this.dataToString(data))
         return
       }
-    }
-    for (const z of zArray) {
-      if (z === undefined) {
-        log.debug('checkZArray abort -> missing Z value', this.dataToString(data))
-        return
+      for (const m of initiatorMembers) {
+        if (!this.members.includes(m)) {
+          log.debug('checkZArray abort -> missing a member', this.dataToString(data))
+          return
+        }
       }
+      for (const z of zArray) {
+        if (z === undefined) {
+          log.debug('checkZArray abort -> missing Z value', this.dataToString(data))
+          return
+        }
+      }
+
+      const myIndex = initiatorMembers.indexOf(this._myId)
+      const zRight = (myIndex + 1) % initiatorMembers.length
+      const zLeft = (initiatorMembers.length + myIndex - 1) % initiatorMembers.length
+      const x = keyAgreementCrypto.computeXi(r, zArray[zRight], zArray[zLeft])
+      assert(xArray[myIndex] === undefined, 'Setting my X value twice')
+      xArray[myIndex] = x
+
+      this.send({ initiator: { id, counter, members: initiatorMembers }, x })
+      this.setStep(Step.WAITING_OTHERS_X)
+      log.debug('checkZArray -> broadcast my X value', {
+        cycle: this.dataToString(data),
+        allCycles: this.toString(),
+      })
     }
-
-    const myIndex = initiatorMembers.indexOf(this._myId)
-    const zRight = (myIndex + 1) % initiatorMembers.length
-    const zLeft = (initiatorMembers.length + myIndex - 1) % initiatorMembers.length
-    const x = keyAgreementCrypto.computeXi(r, zArray[zRight], zArray[zLeft])
-    assert(xArray[myIndex] === undefined, 'Setting my X value twice')
-    xArray[myIndex] = x
-
-    this.send({ initiator: { id, counter, members: initiatorMembers }, x })
-    this.setStep(Step.WAITING_X)
-    log.debug('checkZArray -> broadcast my X value', {
-      cycle: this.dataToString(data),
-      allCycles: this.toString(),
-    })
   }
 
   private async checkXArray(data: IData) {
-    const { id, counter, members: initiatorMembers, zArray, xArray, r } = data
-    if (this.members.length < initiatorMembers.length) {
-      log.debug('checkXArray abort -> length of members are different', this.dataToString(data))
-      return
-    }
-    for (const m of initiatorMembers) {
-      if (!this.members.includes(m)) {
-        log.debug('checkXArray abort -> missing a member', this.dataToString(data))
+    if (this.step === Step.WAITING_OTHERS_X) {
+      const { id, counter, members: initiatorMembers, zArray, xArray, r } = data
+      if (this.members.length < initiatorMembers.length) {
+        log.debug('checkXArray abort -> length of members are different', this.dataToString(data))
         return
       }
-    }
-    for (const x of xArray) {
-      if (x === undefined) {
-        log.debug('checkXArray abort -> missing X value', this.dataToString(data))
-        return
+      for (const m of initiatorMembers) {
+        if (!this.members.includes(m)) {
+          log.debug('checkXArray abort -> missing a member', this.dataToString(data))
+          return
+        }
       }
+      for (const x of xArray) {
+        if (x === undefined) {
+          log.debug('checkXArray abort -> missing X value', this.dataToString(data))
+          return
+        }
+      }
+
+      const myIndex = initiatorMembers.indexOf(this._myId)
+      const zLeft = (initiatorMembers.length + myIndex - 1) % initiatorMembers.length
+      const sharedKey = keyAgreementCrypto.computeSharedSecret(
+        r,
+        xArray[myIndex],
+        zArray[zLeft],
+        xArray
+      )
+
+      if (this.key) {
+        this.previousKey = this.key
+      }
+      this.key = new Key(await keyAgreementCrypto.deriveKey(sharedKey), id, counter)
+      this.data.delete(id)
+
+      perf.mark('end-cycle')
+      perf.measure('group key computation ', 'start-cycle', 'end-cycle')
+      this.setStep(Step.READY)
     }
-
-    const myIndex = initiatorMembers.indexOf(this._myId)
-    const zLeft = (initiatorMembers.length + myIndex - 1) % initiatorMembers.length
-    const sharedKey = keyAgreementCrypto.computeSharedSecret(
-      r,
-      xArray[myIndex],
-      zArray[zLeft],
-      xArray
-    )
-
-    if (this.key) {
-      this.previousKey = this.key
-    }
-    this.key = new Key(await keyAgreementCrypto.deriveKey(sharedKey), id, counter)
-    this.data.delete(id)
-
-    perf.mark('end-cycle')
-    perf.measure('group key computation ', 'start-cycle', 'end-cycle')
-    this.setStep(Step.READY)
   }
 
   // For debugging
