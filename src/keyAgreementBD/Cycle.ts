@@ -315,14 +315,22 @@ export class Cycle {
           return
         }
       }
-      for (const x of xArray) {
-        if (x === undefined) {
-          log.debug(
-            id + ' : ' + counter + ': checkXArray abort -> missing X value',
-            this.dataToString(data)
-          )
-          return
+      if (xArray.length) {
+        for (const x of xArray) {
+          if (x === undefined) {
+            log.debug(
+              id + ' : ' + counter + ': checkXArray abort -> missing X value',
+              this.dataToString(data)
+            )
+            return
+          }
         }
+      } else {
+        log.debug(
+          id + ' : ' + counter + ': checkXArray abort -> empty X array',
+          this.dataToString(data)
+        )
+        return
       }
 
       perf.mark('end X array')
