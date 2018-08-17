@@ -20,15 +20,22 @@ export class Cycle {
   private _onKey: (key: Key) => void // called when the key is ready (i.e. isFinished === true)
   private firstXadded: boolean // for debugging purposes only to know when the first x value was added to the xArray
 
+  // For debugging
+  private myId: number
+  private myMembers: number[]
+
   constructor(
     id: number,
     counter: number,
     members: number[],
     myId: number,
-    send: (msg: IMessage) => void
+    send: (msg: IMessage) => void,
+    myMembers: number[]
   ) {
     perf.mark('start cycle')
     this.id = id
+    this.myId = myId
+    this.myMembers = myMembers
     this.isZBroadcasted = false
     this.isXBroadcasted = false
     this.isFinished = false
@@ -163,6 +170,8 @@ export class Cycle {
       initiatorId: this.id,
       initiatorCounter: this.counter,
       initiatorMembers: this.members.slice(),
+      myId: this.myId,
+      myMembers: this.myMembers.slice(),
       zArray: this.zArray.map((z) => {
         let res = ''
         z.forEach((v) => (res += String.fromCharCode(v)))

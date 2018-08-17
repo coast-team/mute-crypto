@@ -90,7 +90,7 @@ export class KeyAgreementBD extends MuteCrypto {
       super.setState(KeyState.CALCUL_IN_PROGRESS)
       cycle = this.createCycle(id, counter, members)
       cycle.debug('NOT an initiator starts a NEW CYCLE')
-      if (!cycle.isZBroadcasted && cycle.isReadyToBroadcastZ) {
+      if (!cycle.isZBroadcasted && cycle.isReadyToBroadcastZ(this.members)) {
         cycle.broadcastZ()
         cycle.checkZArray(this.myId, this.members)
       }
@@ -172,7 +172,7 @@ export class KeyAgreementBD extends MuteCrypto {
   }
 
   private createCycle(id: number, counter: number, members: number[]): Cycle {
-    const cycle = new Cycle(id, counter, members, this.myId, this.send)
+    const cycle = new Cycle(id, counter, members, this.myId, this.send, this.members)
     this.cycles.set(id, cycle)
     cycle.onKey = (key) => {
       if (this.key) {
