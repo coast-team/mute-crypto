@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.3"></a>
+## [0.2.3](https://github.com/coast-team/mute-crypto/compare/v0.2.2...v0.2.3) (2018-08-20)
+
+
+### Bug Fixes
+
+* **keyagreement:** add an X array emptyness check ([8546b96](https://github.com/coast-team/mute-crypto/commit/8546b96))
+* **keyagreement:** do not delete cycle data entry after key ready ([f44e294](https://github.com/coast-team/mute-crypto/commit/f44e294))
+* **keyagreement:** ignore old cycle's message, check X array ([84134c8](https://github.com/coast-team/mute-crypto/commit/84134c8))
+* **keyagreement:** missing Z/X value from a member ([d6b59ed](https://github.com/coast-team/mute-crypto/commit/d6b59ed))
+
+
+### Performance Improvements
+
+* **keyagreement:** check myId in initiator's members before cycle start ([fdaa349](https://github.com/coast-team/mute-crypto/commit/fdaa349))
+
+
+
 <a name="0.2.2"></a>
 ## [0.2.2](https://github.com/coast-team/mute-crypto/compare/v0.2.0...v0.2.2) (2018-08-13)
 
