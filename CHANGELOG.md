@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/coast-team/mute-crypto/compare/v0.2.3...v0.3.0) (2018-08-21)
+
+
+### Features
+
+* **asymmetric:** export assymetricCrypto object ([5c9a3ed](https://github.com/coast-team/mute-crypto/commit/5c9a3ed))
+
+
+
 <a name="0.2.3"></a>
 ## [0.2.3](https://github.com/coast-team/mute-crypto/compare/v0.2.2...v0.2.3) (2018-08-20)
 

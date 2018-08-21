@@ -1,6 +1,6 @@
 {
   "name": "@coast-team/mute-crypto",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Algorithm generating a cryptographic key for MUTE collaborative session",
   "main": "dist/mute-crypto.es5.cjs.js",
   "module": "dist/mute-crypto.es5.esm.js",
