@@ -55,7 +55,7 @@
     "cz-conventional-changelog": "^2.1.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.2.2",
-    "markdownlint-cli": "^0.12.0",
+    "markdownlint-cli": "^0.13.0",
     "prettier": "^1.14.2",
     "protobufjs": "^6.8.8",
     "rollup": "^0.64.1",
@@ -67,7 +67,7 @@
     "rollup-plugin-typescript2": "^0.16.1",
     "standard-version": "^4.4.0",
     "tslint": "^5.10.0",
-    "tslint-config-prettier": "^1.14.0",
+    "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.0.1",
     "validate-commit-msg": "^2.14.0"
   },
