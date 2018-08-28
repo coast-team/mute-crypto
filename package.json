@@ -36,17 +36,17 @@
     "build": "rm -rf dist && rollup --config",
     "postbuild": "mkdir -p dist/types/keyAgreementBD/proto && cp src/keyAgreementBD/proto/index.d.ts dist/types/keyAgreementBD/proto",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "tslint --fix -p tsconfig.json --exclude src/proto/*d.ts && prettier --write --list-different 'src/**/*.ts' './*.{ts,js,json,md}' && markdownlint ./*.md -i 'CHANGELOG.md'",
+    "lint": "tslint --fix -p tsconfig.json --exclude src/keyAgreementBD/proto/*d.ts && prettier --write --list-different 'src/**/*.ts' './*.{ts,js,json,md}' && markdownlint ./*.md -i 'CHANGELOG.md'",
     "cz": "git-cz",
     "precommit": "lint-staged",
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "prerelease": "npm run build",
     "release": "standard-version --no-verify",
-    "proto": "pbjs -t static-module -w es6 --no-verify --no-delimited --no-convert -o src/keyAgreementBD/proto/index.js src/keyAgreementBD/proto/index.proto && pbts -o src/keyAgreementBD/proto/index.d.ts src/proto/index.js",
+    "proto": "pbjs -t static-module -w es6 --no-verify --no-delimited --no-convert -o src/keyAgreementBD/proto/index.js src/keyAgreementBD/proto/index.proto && pbts -o src/keyAgreementBD/proto/index.d.ts src/keyAgreementBD/proto/index.js",
     "postproto": "rollup -c rollup.config.proto.js"
   },
   "dependencies": {
-    "@coast-team/mute-crypto-helper": "^1.0.0-beta.0"
+    "@coast-team/mute-crypto-helper": "^1.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",
@@ -58,9 +58,9 @@
     "markdownlint-cli": "^0.13.0",
     "prettier": "^1.14.2",
     "protobufjs": "^6.8.8",
-    "rollup": "^0.64.1",
+    "rollup": "^0.65.0",
     "rollup-plugin-cleanup": "^3.0.0",
-    "rollup-plugin-commonjs": "^9.1.5",
+    "rollup-plugin-commonjs": "^9.1.6",
     "rollup-plugin-filesize": "^4.0.1",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-re": "^1.0.7",

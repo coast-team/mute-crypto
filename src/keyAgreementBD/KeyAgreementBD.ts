@@ -1,12 +1,12 @@
-import { symmetricCrypto } from '@coast-team/mute-crypto-helper'
+import { asymmetricCrypto, symmetricCrypto } from '@coast-team/mute-crypto-helper'
 
-import { log } from '../debug'
+import { log, perf } from '../debug'
 import { KeyState } from '../KeyState'
 import { MuteCrypto } from '../MuteCrypto'
 import { Streams } from '../Streams'
 import { Cycle } from './Cycle'
 import { Key } from './Key'
-import { CipherMessage, IMessage, Initiator, Message } from './proto/index'
+import { CipherMessage, Content, IContent, Initiator, Message } from './proto/index'
 
 export class KeyAgreementBD extends MuteCrypto {
   public key: Key | undefined
@@ -17,10 +17,12 @@ export class KeyAgreementBD extends MuteCrypto {
   private myCounter: number
   private members: number[]
   private cycles: Map<number, Cycle>
-  private send: (msg: IMessage) => void
+  private send: (msg: IContent) => void
+  private _signingKey: CryptoKey | undefined
 
   constructor() {
     super()
+    this._signingKey = undefined
     this.myCounter = 0
     this.cycles = new Map()
     this.members = []
@@ -42,7 +44,7 @@ export class KeyAgreementBD extends MuteCrypto {
         })
       ).finish()
     }
-    throw new Error('Failed to ecnrypt a message: cryptographic key is not ready yet')
+    throw new Error('Failed to encrypt a message: cryptographic key is not ready yet')
   }
 
   async decrypt(ciphermsg: Uint8Array): Promise<Uint8Array> {
@@ -57,9 +59,32 @@ export class KeyAgreementBD extends MuteCrypto {
     throw new Error('Failed to decrypt a message')
   }
 
+  public set signingKey(key: CryptoKey) {
+    this._signingKey = key
+  }
+
   public set onSend(send: (msg: Uint8Array, streamID: number) => void) {
-    this.send = (msg: IMessage) => {
-      send(Message.encode(Message.create(msg)).finish(), Streams.KEY_AGREEMENT_BD)
+    if (this._signingKey) {
+      this.send = (msg) => {
+        if (this._signingKey) {
+          const content = Content.encode(Content.create(msg)).finish()
+          perf.mark('start-sign')
+          asymmetricCrypto.sign(content, this._signingKey).then((signature) => {
+            perf.mark('end-sign')
+            perf.measure('Signing', 'start-sign', 'end-sign')
+
+            send(
+              Message.encode(Message.create({ content, signature })).finish(),
+              Streams.KEY_AGREEMENT_BD
+            )
+          })
+        } else {
+          this.send = (msg) => {
+            const content = Content.encode(Content.create(msg)).finish()
+            send(Message.encode(Message.create({ content })).finish(), Streams.KEY_AGREEMENT_BD)
+          }
+        }
+      }
     }
   }
 
@@ -77,11 +102,22 @@ export class KeyAgreementBD extends MuteCrypto {
     this.checkCycles()
   }
 
-  public onMessage(senderId: number, content: Uint8Array) {
-    const msg = Message.decode(content)
+  public async onMessage(senderId: number, msg: Uint8Array, key?: CryptoKey) {
+    const { content, signature } = Message.decode(msg)
+    const msgDecoded = Content.decode(content)
     const {
       initiator: { id, counter, members },
-    } = msg as { initiator: Initiator }
+      type,
+    } = msgDecoded as { initiator: Initiator; type: string }
+    if (key) {
+      perf.mark('start-verify-signature')
+      if (!(await asymmetricCrypto.verifySignature(content, signature, key))) {
+        throw new Error('Wrong signature')
+      }
+      perf.mark('end-verify-signature')
+      perf.measure('Verify Signature', 'start-verify-signature', 'end-verify-signature')
+    }
+
     if (!members.includes(this.myId)) {
       return
     }
@@ -98,19 +134,19 @@ export class KeyAgreementBD extends MuteCrypto {
 
     if (cycle.counter === counter && !cycle.isFinished) {
       const index = cycle.members.indexOf(senderId)
-      switch (msg.type) {
+      switch (type) {
         case 'z':
           cycle.debug(`received Z value from ${senderId}, ${index}`)
           cycle.assert(index !== -1, 'Unable to find a corresponding Z value of ' + senderId)
           cycle.assert(cycle.zArray[index] === undefined, 'Setting Z value twice')
-          cycle.zArray[index] = msg.z
+          cycle.zArray[index] = msgDecoded.z
           cycle.checkZArray(this.myId, this.members)
           break
         case 'x':
           cycle.debug(`received X value from ${senderId}, ${index}`)
           cycle.assert(index !== -1, 'Unable to find a corresponding X value of ' + senderId)
           cycle.assert(cycle.xArray[index] === undefined, 'Setting X value twice')
-          cycle.addX(index, msg.x)
+          cycle.addX(index, msgDecoded.x)
           cycle.checkXArray(this.myId, this.members)
           break
       }

@@ -1,6 +1,11 @@
 syntax = "proto3";
 
 message Message {
+  bytes content = 1;
+  bytes signature = 2;
+}
+
+message Content {
   Initiator initiator = 1;
   oneof type {
     bytes z = 2;

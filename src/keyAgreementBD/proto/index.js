@@ -1290,67 +1290,110 @@ var minimal_2 = minimal$1.Writer;
 var minimal_3 = minimal$1.util;
 var minimal_4 = minimal$1.roots;
 
-var $Reader = minimal_1, $Writer = minimal_2, $util = minimal_3;
-var $root = minimal_4["default"] || (minimal_4["default"] = {});
-var Message = $root.Message = (function () {
+const $Reader = minimal_1, $Writer = minimal_2, $util = minimal_3;
+const $root = minimal_4["default"] || (minimal_4["default"] = {});
+const Message = $root.Message = (() => {
     function Message(properties) {
         if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+            for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-    Message.prototype.initiator = null;
-    Message.prototype.z = $util.newBuffer([]);
-    Message.prototype.x = $util.newBuffer([]);
-    var $oneOfFields;
-    Object.defineProperty(Message.prototype, "type", {
-        get: $util.oneOfGetter($oneOfFields = ["z", "x"]),
-        set: $util.oneOfSetter($oneOfFields)
-    });
+    Message.prototype.content = $util.newBuffer([]);
+    Message.prototype.signature = $util.newBuffer([]);
     Message.create = function create(properties) {
         return new Message(properties);
     };
     Message.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.initiator != null && message.hasOwnProperty("initiator"))
-            $root.Initiator.encode(message.initiator, writer.uint32(10).fork()).ldelim();
-        if (message.z != null && message.hasOwnProperty("z"))
-            writer.uint32(18).bytes(message.z);
-        if (message.x != null && message.hasOwnProperty("x"))
-            writer.uint32(26).bytes(message.x);
+        if (message.content != null && message.hasOwnProperty("content"))
+            writer.uint32(                       10).bytes(message.content);
+        if (message.signature != null && message.hasOwnProperty("signature"))
+            writer.uint32(                       18).bytes(message.signature);
         return writer;
     };
     Message.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Message();
+        let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Message();
         while (reader.pos < end) {
-            var tag = reader.uint32();
+            let tag = reader.uint32();
             switch (tag >>> 3) {
-                case 1:
-                    message.initiator = $root.Initiator.decode(reader, reader.uint32());
-                    break;
-                case 2:
-                    message.z = reader.bytes();
-                    break;
-                case 3:
-                    message.x = reader.bytes();
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
+            case 1:
+                message.content = reader.bytes();
+                break;
+            case 2:
+                message.signature = reader.bytes();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
             }
         }
         return message;
     };
     return Message;
 })();
-var Initiator = $root.Initiator = (function () {
+const Content = $root.Content = (() => {
+    function Content(properties) {
+        if (properties)
+            for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+    Content.prototype.initiator = null;
+    Content.prototype.z = $util.newBuffer([]);
+    Content.prototype.x = $util.newBuffer([]);
+    let $oneOfFields;
+    Object.defineProperty(Content.prototype, "type", {
+        get: $util.oneOfGetter($oneOfFields = ["z", "x"]),
+        set: $util.oneOfSetter($oneOfFields)
+    });
+    Content.create = function create(properties) {
+        return new Content(properties);
+    };
+    Content.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.initiator != null && message.hasOwnProperty("initiator"))
+            $root.Initiator.encode(message.initiator, writer.uint32(                       10).fork()).ldelim();
+        if (message.z != null && message.hasOwnProperty("z"))
+            writer.uint32(                       18).bytes(message.z);
+        if (message.x != null && message.hasOwnProperty("x"))
+            writer.uint32(                       26).bytes(message.x);
+        return writer;
+    };
+    Content.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Content();
+        while (reader.pos < end) {
+            let tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.initiator = $root.Initiator.decode(reader, reader.uint32());
+                break;
+            case 2:
+                message.z = reader.bytes();
+                break;
+            case 3:
+                message.x = reader.bytes();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+    return Content;
+})();
+const Initiator = $root.Initiator = (() => {
     function Initiator(properties) {
         this.members = [];
         if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+            for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
@@ -1364,12 +1407,12 @@ var Initiator = $root.Initiator = (function () {
         if (!writer)
             writer = $Writer.create();
         if (message.id != null && message.hasOwnProperty("id"))
-            writer.uint32(8).uint32(message.id);
+            writer.uint32(                       8).uint32(message.id);
         if (message.counter != null && message.hasOwnProperty("counter"))
-            writer.uint32(16).uint32(message.counter);
+            writer.uint32(                       16).uint32(message.counter);
         if (message.members != null && message.members.length) {
-            writer.uint32(26).fork();
-            for (var i = 0; i < message.members.length; ++i)
+            writer.uint32(                       26).fork();
+            for (let i = 0; i < message.members.length; ++i)
                 writer.uint32(message.members[i]);
             writer.ldelim();
         }
@@ -1378,40 +1421,39 @@ var Initiator = $root.Initiator = (function () {
     Initiator.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Initiator();
+        let end = length === undefined ? reader.len : reader.pos + length, message = new $root.Initiator();
         while (reader.pos < end) {
-            var tag = reader.uint32();
+            let tag = reader.uint32();
             switch (tag >>> 3) {
-                case 1:
-                    message.id = reader.uint32();
-                    break;
-                case 2:
-                    message.counter = reader.uint32();
-                    break;
-                case 3:
-                    if (!(message.members && message.members.length))
-                        message.members = [];
-                    if ((tag & 7) === 2) {
-                        var end2 = reader.uint32() + reader.pos;
-                        while (reader.pos < end2)
-                            message.members.push(reader.uint32());
-                    }
-                    else
+            case 1:
+                message.id = reader.uint32();
+                break;
+            case 2:
+                message.counter = reader.uint32();
+                break;
+            case 3:
+                if (!(message.members && message.members.length))
+                    message.members = [];
+                if ((tag & 7) === 2) {
+                    let end2 = reader.uint32() + reader.pos;
+                    while (reader.pos < end2)
                         message.members.push(reader.uint32());
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
+                } else
+                    message.members.push(reader.uint32());
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
             }
         }
         return message;
     };
     return Initiator;
 })();
-var CipherMessage = $root.CipherMessage = (function () {
+const CipherMessage = $root.CipherMessage = (() => {
     function CipherMessage(properties) {
         if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+            for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
@@ -1425,32 +1467,32 @@ var CipherMessage = $root.CipherMessage = (function () {
         if (!writer)
             writer = $Writer.create();
         if (message.id != null && message.hasOwnProperty("id"))
-            writer.uint32(8).uint32(message.id);
+            writer.uint32(                       8).uint32(message.id);
         if (message.counter != null && message.hasOwnProperty("counter"))
-            writer.uint32(16).uint32(message.counter);
+            writer.uint32(                       16).uint32(message.counter);
         if (message.content != null && message.hasOwnProperty("content"))
-            writer.uint32(26).bytes(message.content);
+            writer.uint32(                       26).bytes(message.content);
         return writer;
     };
     CipherMessage.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.CipherMessage();
+        let end = length === undefined ? reader.len : reader.pos + length, message = new $root.CipherMessage();
         while (reader.pos < end) {
-            var tag = reader.uint32();
+            let tag = reader.uint32();
             switch (tag >>> 3) {
-                case 1:
-                    message.id = reader.uint32();
-                    break;
-                case 2:
-                    message.counter = reader.uint32();
-                    break;
-                case 3:
-                    message.content = reader.bytes();
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
+            case 1:
+                message.id = reader.uint32();
+                break;
+            case 2:
+                message.counter = reader.uint32();
+                break;
+            case 3:
+                message.content = reader.bytes();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
             }
         }
         return message;
@@ -1459,4 +1501,4 @@ var CipherMessage = $root.CipherMessage = (function () {
 })();
 
 export default $root;
-export { Message, Initiator, CipherMessage };
+export { Message, Content, Initiator, CipherMessage };

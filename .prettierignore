@@ -1,4 +1,4 @@
 package.json
 package-lock.json
 CHANGELOG.md
-src/proto/index.d.ts
+src/keyAgreementBD/proto/index.d.ts

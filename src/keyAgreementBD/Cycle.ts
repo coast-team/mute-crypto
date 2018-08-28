@@ -2,7 +2,7 @@ import { BN, keyAgreementCrypto } from '@coast-team/mute-crypto-helper'
 
 import { assert, log, perf } from '../debug'
 import { Key } from './Key'
-import { IMessage } from './proto/index'
+import { IContent } from './proto/index'
 
 export class Cycle {
   public id: number // initiator's id
@@ -16,7 +16,7 @@ export class Cycle {
   public isXBroadcasted: boolean
   public isFinished: boolean // Finished when the key has been generated
 
-  private send: (msg: IMessage) => void
+  private send: (msg: IContent) => void
   private _onKey: (key: Key) => void // called when the key is ready (i.e. isFinished === true)
   private firstXadded: boolean // for debugging purposes only to know when the first x value was added to the xArray
 
@@ -29,7 +29,7 @@ export class Cycle {
     counter: number,
     members: number[],
     myId: number,
-    send: (msg: IMessage) => void,
+    send: (msg: IContent) => void,
     myMembers: number[]
   ) {
     perf.mark('start cycle')
