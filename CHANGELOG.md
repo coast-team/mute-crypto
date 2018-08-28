@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/coast-team/mute-crypto/compare/v0.3.0...v0.4.0) (2018-08-28)
+
+
+### Features
+
+* **keyagreement:** possibility to sign and verify signature ([05f2663](https://github.com/coast-team/mute-crypto/commit/05f2663))
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/coast-team/mute-crypto/compare/v0.2.3...v0.3.0) (2018-08-21)
 
