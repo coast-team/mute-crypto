@@ -1,4 +1,5 @@
 const prefix = ['%cMUTE CRYPTO:%c ', 'background-color: #81C784; padding: 0 2px', '']
+const prefixError = ['%cMUTE CRYPTO ERROR:%c ', 'background-color: #81C784; padding: 0 2px', '']
 const perfPrefix = [
   '%cMUTE CRYPTO:%c %cPERFORMANCE:%c ',
   'background-color: #81C784; padding: 0 2px',
@@ -10,13 +11,16 @@ const perfPrefix = [
 // Logs
 interface Log {
   debug: (...args: any[]) => void
+  error: (...args: any[]) => void
 }
 
-const logEnabled = {
+const logEnabled: Log = {
   debug: (...args: any[]) => console.log(...prefix, ...args),
+  error: (...args: any[]) => console.error(...prefixError, ...args),
 }
-const logDisabled = {
+const logDisabled: Log = {
   debug: () => {},
+  error: () => {},
 }
 
 let log: Log = logDisabled
@@ -65,3 +69,17 @@ function enableDebug(enable = true) {
 }
 
 export { assert, log, perf, enableDebug }
+
+export function bytesToString(bytes: Uint8Array) {
+  const CHUNK_SIZE = 0x8000 // arbitrary number
+  let index = 0
+  const length = bytes.length
+  let result = ''
+  let slice
+  while (index < length) {
+    slice = bytes.subarray(index, Math.min(index + CHUNK_SIZE, length))
+    result += String.fromCharCode.apply(null, slice)
+    index += CHUNK_SIZE
+  }
+  return btoa(result).substr(0, 20) + '...'
+}

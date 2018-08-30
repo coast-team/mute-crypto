@@ -1,6 +1,6 @@
 import { asymmetricCrypto, symmetricCrypto } from '@coast-team/mute-crypto-helper'
 
-import { log, perf } from '../debug'
+import { bytesToString, log } from '../debug'
 import { KeyState } from '../KeyState'
 import { MuteCrypto } from '../MuteCrypto'
 import { Streams } from '../Streams'
@@ -44,6 +44,7 @@ export class KeyAgreementBD extends MuteCrypto {
         })
       ).finish()
     }
+    log.debug('Failed to encrypt a message: cryptographic key is not ready yet')
     throw new Error('Failed to encrypt a message: cryptographic key is not ready yet')
   }
 
@@ -56,6 +57,7 @@ export class KeyAgreementBD extends MuteCrypto {
         return symmetricCrypto.decrypt(content, this.previousKey.value)
       }
     }
+    log.debug('Failed to decrypt a message')
     throw new Error('Failed to decrypt a message')
   }
 
@@ -68,16 +70,16 @@ export class KeyAgreementBD extends MuteCrypto {
       this.send = (msg) => {
         if (this._signingKey) {
           const content = Content.encode(Content.create(msg)).finish()
-          perf.mark('start-sign')
-          asymmetricCrypto.sign(content, this._signingKey).then((signature) => {
-            perf.mark('end-sign')
-            perf.measure('Signing', 'start-sign', 'end-sign')
-
-            send(
-              Message.encode(Message.create({ content, signature })).finish(),
-              Streams.KEY_AGREEMENT_BD
-            )
-          })
+          asymmetricCrypto
+            .sign(content, this._signingKey)
+            .then((signature) => {
+              log.debug('Signing message: ', { signature: bytesToString(signature) })
+              send(
+                Message.encode(Message.create({ content, signature })).finish(),
+                Streams.KEY_AGREEMENT_BD
+              )
+            })
+            .catch((err) => log.error('Signing failed: ', err))
         } else {
           this.send = (msg) => {
             const content = Content.encode(Content.create(msg)).finish()
@@ -91,6 +93,7 @@ export class KeyAgreementBD extends MuteCrypto {
   public addMember(id: number) {
     this.members.push(id)
     this.members.sort((a, b) => a - b)
+    log.debug('MEMBER Joined: ', { id, currentMembers: this.members.slice() })
     this.checkCycles()
   }
 
@@ -99,6 +102,7 @@ export class KeyAgreementBD extends MuteCrypto {
     if (memberIndex !== -1) {
       this.members.splice(memberIndex, 1)
     }
+    log.debug('MEMBER Left: ', { id, currentMembers: this.members.slice() })
     this.checkCycles()
   }
 
@@ -110,12 +114,14 @@ export class KeyAgreementBD extends MuteCrypto {
       type,
     } = msgDecoded as { initiator: Initiator; type: string }
     if (key) {
-      perf.mark('start-verify-signature')
       if (!(await asymmetricCrypto.verifySignature(content, signature, key))) {
+        log.error('Verify signature NOT OK: ', {
+          id: senderId,
+          signature: bytesToString(signature),
+        })
         throw new Error('Wrong signature')
       }
-      perf.mark('end-verify-signature')
-      perf.measure('Verify Signature', 'start-verify-signature', 'end-verify-signature')
+      log.debug('Verify signature OK: ', { id: senderId, signature: bytesToString(signature) })
     }
 
     if (!members.includes(this.myId)) {
