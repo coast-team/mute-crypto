@@ -66,26 +66,21 @@ export class KeyAgreementBD extends MuteCrypto {
   }
 
   public set onSend(send: (msg: Uint8Array, streamID: number) => void) {
-    if (this._signingKey) {
-      this.send = (msg) => {
-        if (this._signingKey) {
-          const content = Content.encode(Content.create(msg)).finish()
-          asymmetricCrypto
-            .sign(content, this._signingKey)
-            .then((signature) => {
-              log.debug('Signing message: ', { signature: bytesToString(signature) })
-              send(
-                Message.encode(Message.create({ content, signature })).finish(),
-                Streams.KEY_AGREEMENT_BD
-              )
-            })
-            .catch((err) => log.error('Signing failed: ', err))
-        } else {
-          this.send = (msg) => {
-            const content = Content.encode(Content.create(msg)).finish()
-            send(Message.encode(Message.create({ content })).finish(), Streams.KEY_AGREEMENT_BD)
-          }
-        }
+    this.send = (msg) => {
+      const content = Content.encode(Content.create(msg)).finish()
+      if (this._signingKey) {
+        asymmetricCrypto
+          .sign(content, this._signingKey)
+          .then((signature) => {
+            log.debug('Signing message: ', { signature: bytesToString(signature) })
+            send(
+              Message.encode(Message.create({ content, signature })).finish(),
+              Streams.KEY_AGREEMENT_BD
+            )
+          })
+          .catch((err) => log.error('Signing failed: ', err))
+      } else {
+        send(Message.encode(Message.create({ content })).finish(), Streams.KEY_AGREEMENT_BD)
       }
     }
   }
