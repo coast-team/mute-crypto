@@ -70,6 +70,10 @@ function enableDebug(enable = true) {
 
 export { assert, log, perf, enableDebug }
 
+/**
+ * From Rohit Singh Sengar's answer on StackOverflow
+ * https://stackoverflow.com/a/25644409
+ */
 export function bytesToString(bytes: Uint8Array) {
   const CHUNK_SIZE = 0x8000 // arbitrary number
   let index = 0
