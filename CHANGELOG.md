@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.1"></a>
+## [0.4.1](https://github.com/coast-team/mute-crypto/compare/v0.4.0...v0.4.1) (2018-09-05)
+
+
+### Bug Fixes
+
+* **buffer:** copy Uint8Array instead of just the reference ([3f9acd5](https://github.com/coast-team/mute-crypto/commit/3f9acd5))
+* **build:** wrong bundle names ([a2091ce](https://github.com/coast-team/mute-crypto/commit/a2091ce))
+* **keyagreement:** didn't send messages if signing key is not set ([4670b5b](https://github.com/coast-team/mute-crypto/commit/4670b5b))
+* **node:** make debugging working in Nodejs ([24953b6](https://github.com/coast-team/mute-crypto/commit/24953b6))
+
+
+
 <a name="0.4.0"></a>
 # [0.4.0](https://github.com/coast-team/mute-crypto/compare/v0.3.0...v0.4.0) (2018-08-28)
 
