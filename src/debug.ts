@@ -1,3 +1,5 @@
+import { env } from './env'
+
 const prefix = ['%cMUTE CRYPTO:%c ', 'background-color: #81C784; padding: 0 2px', '']
 const prefixError = ['%cMUTE CRYPTO ERROR:%c ', 'background-color: #81C784; padding: 0 2px', '']
 const perfPrefix = [
@@ -41,12 +43,12 @@ interface Perf {
 }
 
 const perfEnabled = {
-  mark: (name: string) => window.performance.mark(name),
+  mark: (name: string) => env.performance.mark(name),
   measure: (name: string, startMark: string, endMark: string) => {
-    window.performance.measure(name, startMark, endMark)
-    const measure = window.performance.getEntriesByName(name)[0]
+    env.performance.measure(name, startMark, endMark)
+    const measure = env.performance.getEntriesByName(name)[0]
     console.log(...perfPrefix, `${measure.name} = ${measure.duration.toFixed(0)}ms`)
-    window.performance.clearMeasures()
+    env.performance.clearMeasures()
   },
 }
 const perfDisabled = {
@@ -86,4 +88,14 @@ export function bytesToString(bytes: Uint8Array) {
     index += CHUNK_SIZE
   }
   return btoa(result).substr(0, 20) + '...'
+}
+
+export function btoa(data: string): string {
+  if (typeof window === 'undefined') {
+    const buff = new Buffer(data)
+    return buff.toString('base64')
+    throw new Error('Failed to use decode base64: unsupported environment')
+  } else {
+    return window.btoa(data)
+  }
 }
