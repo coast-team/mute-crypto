@@ -7,7 +7,6 @@ import { Streams } from '../Streams'
 import { Cycle } from './Cycle'
 import { Key } from './Key'
 import { CipherMessage, Content, IContent, Initiator, Message } from './proto/index'
-
 export class KeyAgreementBD extends MuteCrypto {
   public key: Key | undefined
   public previousKey: Key | undefined
@@ -57,6 +56,7 @@ export class KeyAgreementBD extends MuteCrypto {
         return symmetricCrypto.decrypt(content, this.previousKey.value)
       }
     }
+
     log.debug('Failed to decrypt a message')
     throw new Error('Failed to decrypt a message')
   }
@@ -132,7 +132,6 @@ export class KeyAgreementBD extends MuteCrypto {
         cycle.checkZArray(this.myId, this.members)
       }
     }
-
     if (cycle.counter === counter && !cycle.isFinished) {
       const index = cycle.members.indexOf(senderId)
       switch (type) {
@@ -140,14 +139,14 @@ export class KeyAgreementBD extends MuteCrypto {
           cycle.debug(`received Z value from ${senderId}, ${index}`)
           cycle.assert(index !== -1, 'Unable to find a corresponding Z value of ' + senderId)
           cycle.assert(cycle.zArray[index] === undefined, 'Setting Z value twice')
-          cycle.zArray[index] = msgDecoded.z
+          cycle.zArray[index] = msgDecoded.z.slice()
           cycle.checkZArray(this.myId, this.members)
           break
         case 'x':
           cycle.debug(`received X value from ${senderId}, ${index}`)
           cycle.assert(index !== -1, 'Unable to find a corresponding X value of ' + senderId)
           cycle.assert(cycle.xArray[index] === undefined, 'Setting X value twice')
-          cycle.addX(index, msgDecoded.x)
+          cycle.addX(index, msgDecoded.x.slice())
           cycle.checkXArray(this.myId, this.members)
           break
       }
@@ -216,6 +215,7 @@ export class KeyAgreementBD extends MuteCrypto {
         this.previousKey = this.key
       }
       this.key = key
+
       super.setState(KeyState.READY)
       symmetricCrypto.exportKey(this.key.value).then((jsonWebKey) => {
         log.debug('KEY =', symmetricCrypto.toB64(jsonWebKey))

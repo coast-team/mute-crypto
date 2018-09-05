@@ -1,6 +1,6 @@
 import { BN, keyAgreementCrypto } from '@coast-team/mute-crypto-helper'
 
-import { assert, log, perf } from '../debug'
+import { assert, btoa, log, perf } from '../debug'
 import { Key } from './Key'
 import { IContent } from './proto/index'
 
@@ -92,7 +92,9 @@ export class Cycle {
     const myIndex = this.members.indexOf(myId)
     const zRight = (myIndex + 1) % this.members.length
     const zLeft = (this.members.length + myIndex - 1) % this.members.length
+
     const x = keyAgreementCrypto.computeXi(this.r, this.zArray[zRight], this.zArray[zLeft])
+
     perf.mark('X ready')
     this.assert(this.xArray[myIndex] === undefined, 'Setting my X value twice')
     this.addX(myIndex, x)
@@ -121,6 +123,7 @@ export class Cycle {
 
     const myIndex = this.members.indexOf(myId)
     const zLeft = (this.members.length + myIndex - 1) % this.members.length
+
     const sk = keyAgreementCrypto.computeSharedSecret(
       this.r,
       this.xArray[myIndex],
@@ -128,6 +131,7 @@ export class Cycle {
       this.xArray
     )
     const key = new Key(await keyAgreementCrypto.deriveKey(sk), this.id, this.counter)
+
     perf.mark('end cycle')
     perf.measure('R', 'start cycle', 'R ready')
     perf.measure('Z', 'R ready', 'Z ready')
@@ -153,7 +157,8 @@ export class Cycle {
       z: this.z,
     })
     this.isZBroadcasted = true
-    this.debug('broadcast my Z value')
+
+    log.debug('broadcast my Z value')
   }
 
   broadcastX(x: Uint8Array) {
@@ -175,12 +180,12 @@ export class Cycle {
       zArray: this.zArray.map((z) => {
         let res = ''
         z.forEach((v) => (res += String.fromCharCode(v)))
-        return window.btoa(res).substring(0, 7)
+        return btoa(res).substring(0, 7)
       }),
       xArray: this.xArray.map((x) => {
         let res = ''
         x.forEach((v) => (res += String.fromCharCode(v)))
-        return window.btoa(res).substring(0, 7)
+        return btoa(res).substring(0, 7)
       }),
     }
   }

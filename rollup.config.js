@@ -44,6 +44,7 @@ export default [
         sourcemap: true,
       },
     ],
+    external: ['@coast-team/mute-crypto-helper', 'perf_hooks', 'buffer'],
     plugins: [typescript(), resolve(), filesize(filesizeConfig), cleanup()],
   },
   {
@@ -53,7 +54,7 @@ export default [
       format: 'es',
       sourcemap: true,
     },
-    external: ['@coast-team/mute-crypto-helper'],
+    external: ['@coast-team/mute-crypto-helper', 'perf_hooks', 'buffer'],
     plugins: [typescript(tsConfigDeclaration), filesize(filesizeConfig), cleanup()],
   },
   {
