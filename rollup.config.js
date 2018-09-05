@@ -36,10 +36,10 @@ const filesizeConfig = { format: { round: 0 } }
 
 export default [
   {
-    input: 'src/index.ts',
+    input: 'src/index.node.ts',
     output: [
       {
-        file: 'dist/mute-crypto.es5.cjs.js',
+        file: 'dist/mute-crypto.node.es5.cjs.js',
         format: 'cjs',
         sourcemap: true,
       },
@@ -47,9 +47,9 @@ export default [
     plugins: [typescript(), resolve(), filesize(filesizeConfig), cleanup()],
   },
   {
-    input: 'src/index.ts',
+    input: 'src/index.node.ts',
     output: {
-      file: 'dist/mute-crypto.es5.esm.js',
+      file: 'dist/mute-crypto.node.es5.esm.js',
       format: 'es',
       sourcemap: true,
     },
@@ -57,23 +57,48 @@ export default [
     plugins: [typescript(tsConfigDeclaration), filesize(filesizeConfig), cleanup()],
   },
   {
-    input: 'src/index.ts',
+    input: 'src/index.browser.ts',
     output: {
-      file: 'dist/mute-crypto.es2015.esm.js',
+      file: 'dist/mute-crypto.browser.es5.esm.js',
       format: 'es',
       sourcemap: true,
     },
     external: ['@coast-team/mute-crypto-helper'],
-    plugins: [typescript(tsConfigEs2015), filesize(filesizeConfig), cleanup()],
+    plugins: [
+      typescript(tsConfigDeclaration),
+      resolve({ browser: true }),
+      filesize(filesizeConfig),
+      cleanup(),
+    ],
   },
   {
-    input: 'src/index.ts',
+    input: 'src/index.browser.ts',
     output: {
-      file: 'dist/mute-crypto.esnext.esm.js',
+      file: 'dist/mute-crypto.browser.es2015.esm.js',
       format: 'es',
       sourcemap: true,
     },
     external: ['@coast-team/mute-crypto-helper'],
-    plugins: [typescript(tsConfigEsNext), filesize(filesizeConfig), cleanup()],
+    plugins: [
+      typescript(tsConfigEs2015),
+      resolve({ browser: true }),
+      filesize(filesizeConfig),
+      cleanup(),
+    ],
+  },
+  {
+    input: 'src/index.browser.ts',
+    output: {
+      file: 'dist/mute-crypto.browser.esnext.esm.js',
+      format: 'es',
+      sourcemap: true,
+    },
+    external: ['@coast-team/mute-crypto-helper'],
+    plugins: [
+      typescript(tsConfigEsNext),
+      resolve({ browser: true }),
+      filesize(filesizeConfig),
+      cleanup(),
+    ],
   },
 ]
