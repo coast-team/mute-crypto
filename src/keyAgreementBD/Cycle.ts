@@ -1,6 +1,6 @@
 import { BN, keyAgreementCrypto } from '@coast-team/mute-crypto-helper'
 
-import { assert, btoa, log, perf } from '../debug'
+import { assert, log, perf } from '../debug'
 import { Key } from './Key'
 import { IContent } from './proto/index'
 
@@ -130,6 +130,14 @@ export class Cycle {
       this.zArray[zLeft],
       this.xArray
     )
+    this.debug(`Value of r : ${this.r.toString(16)}`)
+    for (const z of this.zArray) {
+      this.debug(`Value of z : ${new BN(z).toString(16)}`)
+    }
+    for (const x of this.xArray) {
+      this.debug(`Value of x : ${new BN(x).toString(16)}`)
+    }
+    this.debug(`Value of sk : ${new BN(sk).toString(16)}`)
     const key = new Key(await keyAgreementCrypto.deriveKey(sk), this.id, this.counter)
 
     perf.mark('end cycle')

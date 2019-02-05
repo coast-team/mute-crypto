@@ -58,16 +58,15 @@ const perfDisabled = {
 
 let perf: Perf = perfDisabled
 
-function enableDebug(enable = true) {
+function enableDebug(enable = true, performanceLog = true) {
   if (enable) {
     log = logEnabled
     assert = assertEnabled
-    perf = perfEnabled
   } else {
     log = logDisabled
     assert = assertDisabled
-    perf = perfDisabled
   }
+  perf = performanceLog ? perfEnabled : perfDisabled
 }
 
 export { assert, log, perf, enableDebug }
@@ -88,14 +87,4 @@ export function bytesToString(bytes: Uint8Array) {
     index += CHUNK_SIZE
   }
   return btoa(result).substr(0, 20) + '...'
-}
-
-export function btoa(data: string): string {
-  if (typeof window === 'undefined') {
-    const buff = new Buffer(data)
-    return buff.toString('base64')
-    throw new Error('Failed to use decode base64: unsupported environment')
-  } else {
-    return window.btoa(data)
-  }
 }

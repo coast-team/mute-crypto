@@ -47,7 +47,8 @@
     "postproto": "rollup -c rollup.config.proto.js"
   },
   "dependencies": {
-    "@coast-team/mute-crypto-helper": "^1.0.3"
+    "@coast-team/mute-crypto-helper": "^1.0.3",
+    "btoa": "^1.2.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.2.1",
