@@ -14,8 +14,8 @@ export class KeyAgreementBD extends MuteCrypto {
   private isReady: boolean
   private myId: number
   private myCounter: number
-  private members: number[]
-  private cycles: Map<number, Cycle>
+  private readonly members: number[]
+  private readonly cycles: Map<number, Cycle>
   private send: (msg: IContent) => void
   private _signingKey: CryptoKey | undefined
 
