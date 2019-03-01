@@ -1,5 +1,7 @@
 # Mute-Crypto
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/coast-team/mute-crypto.svg)](https://greenkeeper.io/)
+
 This library implements the conference key distribution system designed by Burmester and Desmedt[1].
 
 ## Purpose
