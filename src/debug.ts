@@ -83,6 +83,7 @@ export function bytesToString(bytes: Uint8Array) {
   let slice
   while (index < length) {
     slice = bytes.subarray(index, Math.min(index + CHUNK_SIZE, length))
+    //@ts-ignore
     result += String.fromCharCode.apply(null, slice)
     index += CHUNK_SIZE
   }

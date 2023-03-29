@@ -1,6 +1,6 @@
 {
   "name": "@coast-team/mute-crypto",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Algorithm generating a cryptographic key for MUTE collaborative session",
   "main": "dist/mute-crypto.node.es5.cjs.js",
   "module": "dist/mute-crypto.node.es5.esm.js",
@@ -23,7 +23,8 @@
   "author": "",
   "contributors": [
     "Philippe Kalitine <philippe.kalitine@gmail.com> (https://philippe.kalitine.name/)",
-    "Jean-Philippe Eisenbarth"
+    "Jean-Philippe Eisenbarth",
+    "Baptiste Hubert"
   ],
   "license": "AGPL-3.0",
   "bugs": {
@@ -46,11 +47,10 @@
     "proto": "pbjs -t static-module -w es6 --no-verify --no-delimited --no-convert -o src/keyAgreementBD/proto/index.js src/keyAgreementBD/proto/index.proto && pbts -o src/keyAgreementBD/proto/index.d.ts src/keyAgreementBD/proto/index.js",
     "postproto": "rollup -c rollup.config.proto.js"
   },
-  "dependencies": {
-    "@coast-team/mute-crypto-helper": "^1.0.3",
-    "btoa": "^1.2.1"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "btoa": "^1.2.1",
+    "@coast-team/mute-crypto-helper": "^1.0.3",
     "@commitlint/cli": "^7.2.1",
     "@commitlint/config-conventional": "^7.1.2",
     "commitizen": "^2.10.1",

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.4"></a>
+## [0.4.4](https://github.com/coast-team/mute-crypto/compare/v0.4.3...v0.4.4) (2023-03-29)
+
+###
+Moved remaining dependencies to devDependencies
+
 <a name="0.4.3"></a>
 ## [0.4.3](https://github.com/coast-team/mute-crypto/compare/v0.4.2...v0.4.3) (2019-02-13)
 
